@@ -36,49 +36,49 @@ bd[2,1].color = "white"
 bd[3,1].color = "gray"  # OFF button
 
 # Functions to set colors
-def button_red(pos):
+def button_red():
     gpio.output(red_pin, gpio.HIGH)
     gpio.output(green_pin, gpio.LOW)
     gpio.output(blue_pin, gpio.LOW)
     print("Red LED ON")
 
-def button_green(pos):
+def button_green():
     gpio.output(red_pin, gpio.LOW)
     gpio.output(green_pin, gpio.HIGH)
     gpio.output(blue_pin, gpio.LOW)
     print("Green LED ON")
 
-def button_blue(pos):
+def button_blue():
     gpio.output(red_pin, gpio.LOW)
     gpio.output(green_pin, gpio.LOW)
     gpio.output(blue_pin, gpio.HIGH)
     print("Blue LED ON")
 
-def button_yellow(pos):
+def button_yellow():
     gpio.output(red_pin, gpio.HIGH)
     gpio.output(green_pin, gpio.HIGH)
     gpio.output(blue_pin, gpio.LOW)
     print("Yellow LED ON")
 
-def button_cyan(pos):
+def button_cyan():
     gpio.output(red_pin, gpio.LOW)
     gpio.output(green_pin, gpio.HIGH)
     gpio.output(blue_pin, gpio.HIGH)
     print("Cyan LED ON")
 
-def button_magenta(pos):
+def button_magenta():
     gpio.output(red_pin, gpio.HIGH)
     gpio.output(green_pin, gpio.LOW)
     gpio.output(blue_pin, gpio.HIGH)
     print("Magenta LED ON")
 
-def button_white(pos):
+def button_white():
     gpio.output(red_pin, gpio.HIGH)
     gpio.output(green_pin, gpio.HIGH)
     gpio.output(blue_pin, gpio.HIGH)
     print("White LED ON")
 
-def button_off(pos):
+def button_off():
     gpio.output(red_pin, gpio.LOW)
     gpio.output(green_pin, gpio.LOW)
     gpio.output(blue_pin, gpio.LOW)

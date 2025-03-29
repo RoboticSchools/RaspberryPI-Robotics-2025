@@ -26,12 +26,12 @@ bd[0,0].color = "green"  # ON button (Green)
 bd[1,0].color = "red"    # OFF button (Red)
 
 # Function to turn LED ON
-def button_on(pos):
+def button_on():
     gpio.output(led_pin, gpio.HIGH)
     print("LED ON - Button ON Pressed")
 
 # Function to turn LED OFF
-def button_off(pos):
+def button_off():
     gpio.output(led_pin, gpio.LOW)
     print("LED OFF - Button OFF Pressed")
 
