@@ -21,6 +21,10 @@ gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
 # BlueDot setup with 2 buttons in a single row
 bd = BlueDot(cols=2, rows=1)
 
+# Set button colors
+bd[0,0].color = "green"  # ON button (Green)
+bd[1,0].color = "red"    # OFF button (Red)
+
 # Function to turn LED ON
 def button_on(pos):
     gpio.output(led_pin, gpio.HIGH)

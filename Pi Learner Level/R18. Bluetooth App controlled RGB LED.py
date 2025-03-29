@@ -25,6 +25,16 @@ gpio.setup(blue_pin, gpio.OUT)  # Set Blue LED pin as output
 # BlueDot setup with 8 buttons (7 colors + 1 OFF)
 bd = BlueDot(cols=4, rows=2)
 
+# Set button colors
+bd[0,0].color = "red"
+bd[1,0].color = "green"
+bd[2,0].color = "blue"
+bd[3,0].color = "yellow"
+bd[0,1].color = "cyan"
+bd[1,1].color = "magenta"
+bd[2,1].color = "white"
+bd[3,1].color = "gray"  # OFF button
+
 # Functions to set colors
 def button_red(pos):
     gpio.output(red_pin, gpio.HIGH)
