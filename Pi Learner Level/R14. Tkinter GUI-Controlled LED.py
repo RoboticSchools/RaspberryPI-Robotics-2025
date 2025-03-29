@@ -29,17 +29,17 @@ def led_off():
 # Create GUI window
 window = tk.Tk()
 window.title("LED Controller")
-window.geometry("500x400")
+window.geometry("500x300")
 
-# LED control buttons
-button_on = tk.Button(window, text="LED ON", bg="#b4dd1e", font=("Century Gothic", 15), relief="flat", command=led_on)
-button_on.pack(pady=20, ipadx=10, ipady=10)
+# LED control buttons (same size)
+button_on = tk.Button(window, text="LED ON", bg="#b4dd1e", font=("Arial", 15), relief="flat", command=led_on, width=15, height=2)
+button_on.pack(pady=20)
 
-button_off = tk.Button(window, text="LED OFF", bg="#ff4444", font=("Century Gothic", 15), relief="flat", command=led_off)
-button_off.pack(pady=20, ipadx=10, ipady=10)
+button_off = tk.Button(window, text="LED OFF", bg="#ff4444", font=("Arial", 15), relief="flat", command=led_off, width=15, height=2)
+button_off.pack(pady=20)
 
 # LED status label
-label = tk.Label(window, text="LED is OFF", font=("Century Gothic", 13), fg="red")
+label = tk.Label(window, text="LED is OFF", font=("Arial", 13), fg="red")
 label.pack(pady=10)
 
 # Run the Tkinter event loop
