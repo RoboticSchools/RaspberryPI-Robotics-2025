@@ -25,7 +25,7 @@ gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
 blynk = Blynk(BLYNK_AUTH)
 
 # Function to handle virtual pin V0 (LED control)
-@blynk.VIRTUAL_WRITE(0)
+@blynk.on("V0")
 def control_led(value):
     if int(value[0]) == 1:
         gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
@@ -33,6 +33,11 @@ def control_led(value):
     else:
         gpio.output(led_pin, gpio.LOW)  # Turn LED OFF
         print("LED OFF - Blynk Button Released")
+
+# Function to handle connection
+@blynk.on("connected")
+def blynk_connected():
+    print("Blynk Connected")
 
 # Run Blynk
 while True:
