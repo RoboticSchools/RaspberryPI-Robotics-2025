@@ -2,7 +2,7 @@
 Components Used:
 - Raspberry Pi
 - Raspi Motor HAT
-- 2 LDR Sensors (Left and Right)
+- 2 IR Sensors (Left and Right)
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
 - Breadboard
 - Jumper Wires
@@ -15,8 +15,9 @@ from Raspi_MotorHAT import Raspi_MotorHAT
 # Setup GPIO mode and pins
 GPIO.setmode(GPIO.BCM)
 
-left_sensor_pin = 17  # LDR sensor connected to GPIO 17
-right_sensor_pin = 27  # LDR sensor connected to GPIO 27
+# IR sensor pins
+left_sensor_pin = 17  # IR sensor connected to GPIO 17
+right_sensor_pin = 27  # IR sensor connected to GPIO 27
 
 # Initialize Motor HAT (Default I2C address 0x6F)
 mh = Raspi_MotorHAT(addr=0x6f)
@@ -34,7 +35,7 @@ right_back_motor.setSpeed(speed)
 left_front_motor.setSpeed(speed)
 left_back_motor.setSpeed(speed)
 
-# Set up the LDR sensor pins
+# Set up the IR sensor pins
 GPIO.setup(left_sensor_pin, GPIO.IN)
 GPIO.setup(right_sensor_pin, GPIO.IN)
 
@@ -80,16 +81,16 @@ try:
         right_sensor = GPIO.input(right_sensor_pin)
 
         if left_sensor == GPIO.HIGH and right_sensor == GPIO.LOW:
-            # Move right if the left sensor detects more light
+            # Turn right if the left sensor is off the line (detected HIGH, off the line)
             turn_right()
         elif left_sensor == GPIO.LOW and right_sensor == GPIO.HIGH:
-            # Move left if the right sensor detects more light
+            # Turn left if the right sensor is off the line (detected HIGH, off the line)
             turn_left()
-        elif left_sensor == GPIO.HIGH and right_sensor == GPIO.HIGH:
-            # Move forward if both sensors detect light
+        elif left_sensor == GPIO.LOW and right_sensor == GPIO.LOW:
+            # Move forward if both sensors are on the line (detected LOW, on the line)
             move_forward()
         else:
-            # Stop the motors if no light is detected
+            # Stop the motors if both sensors are off the line (both HIGH)
             stop_motors()
 
         time.sleep(0.1)  # Small delay for smooth operation
