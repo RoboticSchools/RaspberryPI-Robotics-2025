@@ -1,32 +1,31 @@
 """
 Components Used:
 - Raspberry Pi
-- OLED Display (128x64) using SSD1306
+- OLED Display (128x64) using SSD1306 (I2C)
 - Jumper Wires
 """
 
 import time
-import Adafruit_SSD1306
+import board
+import busio
 import psutil
 from PIL import Image, ImageDraw, ImageFont
-import RPi.GPIO as GPIO
+import adafruit_ssd1306
 
-# Initialize the display
-disp = Adafruit_SSD1306.SSD1306_128_64(rst=24)
+# Initialize I2C interface
+i2c = busio.I2C(board.SCL, board.SDA)
 
-# Initialize library
-disp.begin()
+# Create SSD1306 display object
+oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
 
 # Clear the display
-disp.clear()
-disp.display()
+oled.fill(0)
+oled.show()
 
 # Create an image buffer
-width = disp.width
-height = disp.height
-image = Image.new('1', (width, height))
-
-# Create a drawing object
+width = oled.width
+height = oled.height
+image = Image.new("1", (width, height))
 draw = ImageDraw.Draw(image)
 
 # Load a font
@@ -45,14 +44,14 @@ def display_stats():
     draw.rectangle((0, 0, width, height), outline=0, fill=0)  # Clear display
 
     # Display CPU usage
-    draw.text((0, 0), f"CPU: {cpu}% ", font=font, fill=255)
+    draw.text((0, 0), f"CPU: {cpu}%", font=font, fill=255)
 
     # Display memory usage
-    draw.text((0, 20), f"RAM: {memory}% ", font=font, fill=255)
+    draw.text((0, 20), f"RAM: {memory}%", font=font, fill=255)
 
     # Update the display
-    disp.image(image)
-    disp.display()
+    oled.image(image)
+    oled.show()
 
 # Continuously update stats on OLED
 try:
@@ -61,6 +60,6 @@ try:
         time.sleep(2)  # Update every 2 seconds
 
 except KeyboardInterrupt:
-    disp.clear()
-    disp.display()
+    oled.fill(0)
+    oled.show()
     print("Exiting program.")
