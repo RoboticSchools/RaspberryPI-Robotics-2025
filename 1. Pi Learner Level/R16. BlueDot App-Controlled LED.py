@@ -3,19 +3,20 @@ Components Used:
 - Raspberry Pi
 - LED
 - BlueDot App
-- Jumper Wires
 - Breadboard
+- Jumper Wires
 """
 
 import RPi.GPIO as gpio
 from bluedot import BlueDot
+from signal import pause
 
 # Pin configuration
-led_pin = 21  # GPIO21 connected to LED
+led_pin = 21
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+gpio.setup(led_pin, gpio.OUT)
 
 # BlueDot setup
 bd = BlueDot()
@@ -35,8 +36,6 @@ bd.when_released = led_off  # LED OFF when button is released
 
 # Keep the script running
 try:
-    bd.wait_for_press()
+    pause()
 except KeyboardInterrupt:
-    pass
-
-gpio.cleanup()  # Reset GPIO settings before exiting
+    gpio.cleanup()  # Reset GPIO settings before exiting

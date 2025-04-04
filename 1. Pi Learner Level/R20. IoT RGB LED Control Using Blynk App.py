@@ -2,31 +2,31 @@
 Components Used:
 - Raspberry Pi
 - RGB LED (Common Cathode)
-- Blynk App (Menu Widget)
-- Jumper Wires
+- Blynk Web App
 - Breadboard
+- Jumper Wires
 """
 
 import RPi.GPIO as gpio
-import BlynkLib
+from BlynkLib import Blynk
 import time
 
 # Blynk authentication token (replace with your actual token)
 BLYNK_AUTH = "35MM8LiiGN_EPE96RJsB-wK3E5tlwbxK"
 
 # Pin configuration
-red_pin = 21   # GPIO21 connected to Red LED
-green_pin = 20 # GPIO20 connected to Green LED
-blue_pin = 16  # GPIO16 connected to Blue LED
+red_pin = 21  
+green_pin = 20 
+blue_pin = 16 
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(red_pin, gpio.OUT)   # Set Red LED pin as output
-gpio.setup(green_pin, gpio.OUT) # Set Green LED pin as output
-gpio.setup(blue_pin, gpio.OUT)  # Set Blue LED pin as output
+gpio.setup(red_pin, gpio.OUT)   
+gpio.setup(green_pin, gpio.OUT)
+gpio.setup(blue_pin, gpio.OUT)
 
 # Initialize Blynk
-blynk = BlynkLib.Blynk(BLYNK_AUTH)
+blynk = Blynk(BLYNK_AUTH)
 
 # Function to set RGB LED color
 def set_color(r, g, b, color_name):
@@ -62,7 +62,10 @@ def menu_handler(value):
 def blynk_connected():
     print("Blynk Connected")
 
-# Run Blynk
-while True:
-    blynk.run()
-    time.sleep(0.1)
+try:
+    while True:
+        blynk.run()
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    gpio.cleanup()

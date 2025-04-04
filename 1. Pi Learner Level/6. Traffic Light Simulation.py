@@ -12,9 +12,9 @@ import RPi.GPIO as gpio
 import time
 
 # Pin configuration
-green_led = 21   # GPIO21 for Green LED (Go)
-yellow_led = 20  # GPIO20 for Yellow LED (Ready)
-red_led = 16     # GPIO16 for Red LED (Stop)
+green_led = 21   
+yellow_led = 16 
+red_led = 12 
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Use BCM pin numbering
@@ -24,9 +24,9 @@ gpio.setup(green_led, gpio.OUT)
 
 try:
     while True:
-        gpio.output(red_led, gpio.LOW)
-        gpio.output(yellow_led, gpio.LOW)
         gpio.output(green_led, gpio.HIGH)  # Green LED ON (Go)
+        gpio.output(yellow_led, gpio.LOW)
+        gpio.output(red_led, gpio.LOW)
         print("Green Light - GO")
         time.sleep(5)
 
@@ -36,13 +36,11 @@ try:
         print("Yellow Light - SLOW DOWN")
         time.sleep(2)
 
+        gpio.output(green_led, gpio.LOW)
         gpio.output(yellow_led, gpio.LOW)
         gpio.output(red_led, gpio.HIGH)  # Red LED ON (Stop)
-        gpio.output(green_led, gpio.LOW)
         print("Red Light - STOP")
         time.sleep(5)
 
 except KeyboardInterrupt:
-    pass
-
-gpio.cleanup()  # Reset GPIO settings on exit
+    gpio.cleanup()  # Reset GPIO settings on exit

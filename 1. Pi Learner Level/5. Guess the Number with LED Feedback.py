@@ -13,9 +13,9 @@ import time
 import random
 
 # Pin configuration
-green_led = 21   # GPIO21 for correct guess (Green LED)
-yellow_led = 20  # GPIO20 for low guess (Yellow LED)
-red_led = 16     # GPIO16 for high guess (Red LED)
+green_led = 21   
+yellow_led = 16  
+red_led = 12 
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Use BCM pin numbering
@@ -58,6 +58,4 @@ try:
         gpio.output(red_led, gpio.LOW)
 
 except KeyboardInterrupt:
-    pass
-
-gpio.cleanup()  # Reset GPIO settings on exit
+    gpio.cleanup()  # Reset GPIO settings on exit

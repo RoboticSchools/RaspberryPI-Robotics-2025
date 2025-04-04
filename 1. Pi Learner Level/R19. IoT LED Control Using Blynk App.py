@@ -1,10 +1,10 @@
 """
 Components Used:
 - Raspberry Pi
-- One LED
-- Blynk App
-- Jumper Wires
+- LED
+- Blynk Web App
 - Breadboard
+- Jumper Wires
 """
 
 import RPi.GPIO as gpio
@@ -15,11 +15,11 @@ import time
 BLYNK_AUTH = "35MM8LiiGN_EPE96RJsB-wK3E5tlwbxK"
 
 # Pin configuration
-led_pin = 21  # GPIO21 connected to LED
+led_pin = 21
 
 # GPIO setup
-gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+gpio.setmode(gpio.BCM)
+gpio.setup(led_pin, gpio.OUT)
 
 # Initialize Blynk
 blynk = Blynk(BLYNK_AUTH)
@@ -28,10 +28,10 @@ blynk = Blynk(BLYNK_AUTH)
 @blynk.on("V0")
 def control_led(value):
     if int(value[0]) == 1:
-        gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
+        gpio.output(led_pin, gpio.HIGH)
         print("LED ON - Blynk Button Pressed")
     else:
-        gpio.output(led_pin, gpio.LOW)  # Turn LED OFF
+        gpio.output(led_pin, gpio.LOW)
         print("LED OFF - Blynk Button Released")
 
 # Function to handle connection
@@ -39,7 +39,10 @@ def control_led(value):
 def blynk_connected():
     print("Blynk Connected")
 
-# Run Blynk
-while True:
-    blynk.run()
-    time.sleep(0.1)
+try:
+    while True:
+        blynk.run()
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    gpio.cleanup()

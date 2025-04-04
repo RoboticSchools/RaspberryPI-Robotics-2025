@@ -11,15 +11,15 @@ import RPi.GPIO as gpio
 import time
 
 # Pin configuration
-led_pin = 21       # GPIO21 connected to LED
-button_on = 20     # GPIO20 connected to ON Button
-button_off = 16    # GPIO16 connected to OFF Button
+led_pin = 21 
+button_on = 16
+button_off = 12  
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
 gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
-gpio.setup(button_on, gpio.IN, pull_up_down=gpio.PUD_UP)  # Set ON button as input with pull-up resistor
-gpio.setup(button_off, gpio.IN, pull_up_down=gpio.PUD_UP)  # Set OFF button as input with pull-up resistor
+gpio.setup(button_on, gpio.IN, pull_up_down=gpio.PUD_UP)  # Set ON button as input with internal pull-up resistor
+gpio.setup(button_off, gpio.IN, pull_up_down=gpio.PUD_UP)  # Set OFF button as input with internal pull-up resistor
 
 try:
     while True:

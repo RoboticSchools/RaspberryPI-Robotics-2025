@@ -11,8 +11,8 @@ import RPi.GPIO as gpio
 import time
 
 # Pin configuration
-led_pin = 21     # GPIO21 connected to the LED
-button_pin = 16  # GPIO16 connected to the push button
+led_pin = 21 
+button_pin = 16 
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
@@ -23,9 +23,10 @@ led_state = False  # Variable to store LED state (ON/OFF)
 
 try:
     while True:
-        if gpio.input(button_pin) == gpio.LOW:  # Check if button is pressed
+        if gpio.input(button_pin) == 0:  # Check if button is pressed
             time.sleep(0.1)  # Simple debounce delay
-            while gpio.input(button_pin) == gpio.LOW:  # Wait for button to be released
+
+            while gpio.input(button_pin) == 0:  # Wait for button to be released
                 pass
             
             led_state = not led_state  # Toggle LED state
@@ -35,6 +36,4 @@ try:
             print("LED ON" if led_state else "LED OFF")
 
 except KeyboardInterrupt:
-    pass  # Handle keyboard interrupt (Ctrl+C) safely
-
-gpio.cleanup()  # Reset GPIO settings before exiting
+    gpio.cleanup()  # Reset GPIO settings before exiting

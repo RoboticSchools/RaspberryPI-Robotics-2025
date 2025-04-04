@@ -12,11 +12,11 @@ from bluedot import BlueDot
 from signal import pause
 
 # Pin configuration
-led_pin = 21  # GPIO21 connected to LED
+led_pin = 21 
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+gpio.setup(led_pin, gpio.OUT)
 
 # BlueDot setup with 2 buttons in a single row
 bd = BlueDot(cols=2, rows=1)
@@ -38,4 +38,8 @@ def button_off():
 bd[0,0].when_pressed = button_on  # Assign button 1 to turn LED ON
 bd[1,0].when_pressed = button_off  # Assign button 2 to turn LED OFF
 
-pause()  # Keep the script running
+# Keep the script running
+try:
+    pause()
+except KeyboardInterrupt:
+    gpio.cleanup()  # Reset GPIO settings before exiting

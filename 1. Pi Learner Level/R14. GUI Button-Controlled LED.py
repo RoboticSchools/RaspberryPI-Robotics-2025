@@ -10,21 +10,21 @@ import RPi.GPIO as gpio
 import tkinter as tk
 
 # Pin configuration
-led_pin = 21  # GPIO21 connected to LED
+led_pin = 21
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+gpio.setup(led_pin, gpio.OUT)
 
 # Function to turn LED ON
 def led_on():
     gpio.output(led_pin, gpio.HIGH)
-    label.config(text="LED is ON", fg="green")
+    label.config(text="LED is ON")
 
 # Function to turn LED OFF
 def led_off():
     gpio.output(led_pin, gpio.LOW)
-    label.config(text="LED is OFF", fg="red")
+    label.config(text="LED is OFF")
 
 # Create GUI window
 window = tk.Tk()
@@ -39,13 +39,11 @@ button_off = tk.Button(window, text="LED OFF", bg="#ff4444", font=("Arial", 15),
 button_off.pack(pady=20)
 
 # LED status label
-label = tk.Label(window, text="LED is OFF", font=("Arial", 13), fg="red")
+label = tk.Label(window, text="LED is OFF", font=("Arial", 13))
 label.pack(pady=10)
 
 # Run the Tkinter event loop
 try:
     window.mainloop()
 except KeyboardInterrupt:
-    pass
-
-gpio.cleanup()  # Reset GPIO settings before exiting
+    gpio.cleanup()  # Reset GPIO settings before exiting
