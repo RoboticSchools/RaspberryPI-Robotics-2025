@@ -12,7 +12,7 @@ import time
 
 # Pin configuration
 led_pin = 21      # GPIO21 connected to LED
-button_pin = 20   # GPIO20 connected to Button
+button_pin = 16   # GPIO16 connected to Button
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM

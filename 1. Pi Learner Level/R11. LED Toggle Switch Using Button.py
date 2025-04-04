@@ -11,8 +11,8 @@ import RPi.GPIO as gpio
 import time
 
 # Pin configuration
-button_pin = 20  # GPIO20 connected to the push button
 led_pin = 21     # GPIO21 connected to the LED
+button_pin = 16  # GPIO16 connected to the push button
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM

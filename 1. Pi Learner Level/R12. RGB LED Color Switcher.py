@@ -12,10 +12,10 @@ import time
 import random
 
 # Pin configuration
-red_pin = 4      # GPIO4 connected to Red pin of RGB LED
-green_pin = 5    # GPIO5 connected to Green pin of RGB LED
-blue_pin = 6     # GPIO6 connected to Blue pin of RGB LED
-button_pin = 7   # GPIO7 connected to Push Button
+red_pin = 21      # GPIO21 connected to Red pin of RGB LED
+green_pin = 20    # GPIO20 connected to Green pin of RGB LED
+blue_pin = 16     # GPIO16 connected to Blue pin of RGB LED
+button_pin = 12   # GPIO12 connected to Push Button
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM

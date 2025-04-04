@@ -13,7 +13,7 @@ import time
 
 # Pin configuration
 buzzer_pin = 21  # GPIO pin connected to the Buzzer
-button_pins = [20, 16, 12, 25, 24]  # GPIO pins connected to the buttons
+button_pins = [26, 19, 13, 6, 5]  # GPIO pins connected to the buttons
 
 # Frequencies for musical notes (C, D, E, F, G)
 notes = [262, 294, 330, 349, 392]  # Corresponding frequencies in Hz
