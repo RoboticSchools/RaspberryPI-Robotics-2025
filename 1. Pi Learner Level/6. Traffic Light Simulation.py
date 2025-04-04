@@ -1,9 +1,9 @@
 """
 Components Used:
 - Raspberry Pi
-- Red LED (Stop)
-- Yellow LED (Slow Down)
 - Green LED (Go)
+- Yellow LED (Slow Down)
+- Red LED (Stop)
 - Breadboard
 - Jumper Wires
 """
