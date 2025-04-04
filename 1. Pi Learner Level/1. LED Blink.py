@@ -10,7 +10,7 @@ import RPi.GPIO as gpio
 import time
 
 # Pin configuration
-led_pin = 21  # Use GPIO21 (Physical pin 40)
+led_pin = 21  # Use GPIO21
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
