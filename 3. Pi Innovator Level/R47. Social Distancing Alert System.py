@@ -1,7 +1,7 @@
 """
 Components Used:
 - Raspberry Pi
-- Ultrasonic Sensor (HC-SR04)
+- Ultrasonic Sensor
 - Red LED
 - Green LED
 - Buzzer
@@ -15,9 +15,9 @@ import RPi.GPIO as gpio
 # GPIO Pin configuration
 trig = 23      # Trigger pin of HC-SR04
 echo = 24      # Echo pin of HC-SR04
-red_led = 17   # Red LED pin
-green_led = 27 # Green LED pin
-buzzer = 22    # Buzzer pin
+red_led = 12   # Red LED pin
+green_led = 16 # Green LED pin
+buzzer = 21    # Buzzer pin
 
 # GPIO setup
 gpio.setmode(gpio.BCM)

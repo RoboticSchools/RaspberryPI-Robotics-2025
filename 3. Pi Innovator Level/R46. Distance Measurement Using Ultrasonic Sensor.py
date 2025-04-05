@@ -1,7 +1,7 @@
 """
 Components Used:
 - Raspberry Pi
-- Ultrasonic Sensor (HC-SR04)
+- Ultrasonic Sensor
 - Breadboard
 - Jumper Wires
 """
