@@ -1,7 +1,7 @@
 """
 Components Used:
 - Raspberry Pi
-- UGeek DC Motor HAT
+- Pi DC Motor HAT
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
 - Joystick (X-axis and Y-axis)
 - ADS1115 ADC (to read joystick analog values)
@@ -15,24 +15,22 @@ from adafruit_ads1x15.ads1115 import ADS1115
 from adafruit_ads1x15.analog_in import AnalogIn
 from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
 
-# Setup I2C for ADS1115 (to read joystick analog values)
-i2c = busio.I2C(board.SCL, board.SDA)  # Initialize I2C interface
-ads = ADS1115(i2c)  # Initialize ADS1115
+# setup i2c and ads1115 for reading joystick input
+i2c = busio.I2C(board.SCL, board.SDA)
+ads = ADS1115(i2c)
 
-# Define the analog input channels for X-axis and Y-axis
-x_axis_channel = AnalogIn(ads, ADS1115.P0)  # Joystick X-axis connected to A0
-y_axis_channel = AnalogIn(ads, ADS1115.P1)  # Joystick Y-axis connected to A1
+# assign ads channels for x and y joystick axes
+x_axis_channel = AnalogIn(ads, ADS1115.P0)
+y_axis_channel = AnalogIn(ads, ADS1115.P1)
 
-# Initialize Motor HAT (Default I2C address 0x6F)
+# initialize motor hat and setup motors
 mh = Raspi_MotorHAT(addr=0x6f)
-
-# Create motor objects for the four wheels
 rightFront = mh.getMotor(1)
 rightBack = mh.getMotor(2)
 leftFront = mh.getMotor(3)
 leftBack = mh.getMotor(4)
 
-# Set motors speed
+# set motor speed
 speed = 150
 rightFront.setSpeed(speed)
 rightBack.setSpeed(speed)
@@ -40,14 +38,9 @@ leftFront.setSpeed(speed)
 leftBack.setSpeed(speed)
 
 def read_joystick():
-    """Reads the joystick values from X and Y axes."""
-    x_value = x_axis_channel.value  # Read the X-axis analog value (0-65535)
-    y_value = y_axis_channel.value  # Read the Y-axis analog value (0-65535)
-    
-    # Print the joystick values
-    print(f"X-axis Value: {x_value}")
-    print(f"Y-axis Value: {y_value}")
-    
+    x_value = x_axis_channel.value
+    y_value = y_axis_channel.value
+    print(f"X: {x_value} | Y: {y_value}")
     return x_value, y_value
 
 def move_forward():
@@ -85,24 +78,24 @@ def stop_motors():
     leftFront.run(Raspi_MotorHAT.RELEASE)
     leftBack.run(Raspi_MotorHAT.RELEASE)
 
-# Run the robot based on joystick input
+# main loop to control robot using joystick
 try:
     while True:
-        x_value, y_value = read_joystick()  # Get joystick input
+        x_value, y_value = read_joystick()
 
-        if y_value < 3000:  # Move forward if joystick pushed forward (Y value low)
+        if y_value < 3000:
             move_forward()
-        elif y_value > 30000:  # Move backward if joystick pushed backward (Y value high)
+        elif y_value > 30000:
             move_backward()
-        elif x_value < 3000:  # Turn left if joystick pushed left (X value low)
+        elif x_value < 3000:
             turn_left()
-        elif x_value > 30000:  # Turn right if joystick pushed right (X value high)
+        elif x_value > 30000:
             turn_right()
-        else:  # Stop motors if joystick is centered
+        else:
             stop_motors()
 
-        time.sleep(0.1)  # Small delay for smoother operation
+        time.sleep(0.1)
 
 except KeyboardInterrupt:
     print("Exiting program...")
-    stop_motors()  # Ensure motors stop when the program is interrupted
+    stop_motors()

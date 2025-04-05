@@ -1,50 +1,43 @@
 """
 Components Used:
 - Raspberry Pi
-- Raspi Motor HAT
+- Pi DC Motor HAT
 - DC Motor
 - Potentiometer
 - ADS1115 ADC (to read potentiometer analog values)
 - Jumper Wires
 """
+
 import time
 import busio
+import board
 from adafruit_ads1x15.ads1115 import ADS1115
 from adafruit_ads1x15.analog_in import AnalogIn
 from Raspi_MotorHAT import Raspi_MotorHAT
-import board
 
-# Setup I2C bus for ADS1115 (to read potentiometer)
-i2c = busio.I2C(board.SCL, board.SDA)  # Initialize I2C interface
-ads = ADS1115(i2c)                    # Initialize ADS1115
-potentiometer_channel = AnalogIn(ads, ADS1115.P0)  # Connect potentiometer to A0
+# initialize i2c for ads1115
+i2c = busio.I2C(board.SCL, board.SDA)
+ads = ADS1115(i2c)
+pot_channel = AnalogIn(ads, ADS1115.P0)
 
-# Initialize Raspi Motor HAT
-mh = Raspi_MotorHAT(addr=0x6F)
-motor = mh.getMotor(1)  # Using motor 1 for control
-
-def read_potentiometer():
-    """Reads the potentiometer value and maps it to motor speed (0 to 255)."""
-    pot_value = potentiometer_channel.value  # Read the potentiometer value (0-65535)
-    
-    # Map potentiometer value to motor speed (0 to 255)
-    motor_speed = int((pot_value * 255) / 65535)
-    
-    return motor_speed
-
-def control_motor_speed():
-    """Control the DC motor speed based on potentiometer input."""
-    while True:
-        motor_speed = read_potentiometer()  # Get the motor speed from potentiometer
-        motor.setSpeed(motor_speed)         # Set motor speed (0-255)
-        motor.run(Raspi_MotorHAT.FORWARD)   # Run motor forward
-        
-        print(f"Motor Speed: {motor_speed}")  # Print the motor speed to the terminal
-        
-        time.sleep(0.1)  # Small delay for smooth operation
+# initialize motor HAT and motor on port 1
+mh = Raspi_MotorHAT(addr=0x6f)
+motor = mh.getMotor(1)
 
 try:
-    control_motor_speed()
+    print("DC motor speed control started...")
+
+    # main loop to control motor speed using potentiometer
+    while True:
+        pot_value = pot_channel.value
+        motor_speed = int((pot_value * 255) / 65535)
+
+        motor.setSpeed(motor_speed)
+        motor.run(Raspi_MotorHAT.FORWARD)
+
+        print(f"Motor Speed: {motor_speed}")
+        time.sleep(0.1)
+
 except KeyboardInterrupt:
-    motor.run(Raspi_MotorHAT.RELEASE)  # Stop the motor on keyboard interrupt
+    motor.run(Raspi_MotorHAT.RELEASE)
     print("Motor stopped.")

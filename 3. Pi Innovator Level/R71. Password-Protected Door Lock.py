@@ -24,8 +24,8 @@ KEYPAD = [
 ]
 
 # Define GPIO pins for keypad rows and columns
-ROW_PINS = [5, 6, 13, 19]  # Connected to Raspberry Pi GPIO
-COL_PINS = [12, 16, 20, 21]  # Connected to Raspberry Pi GPIO
+ROW_PINS = [5, 6, 13, 19] 
+COL_PINS = [12, 16, 20, 21]
 
 # Initialize keypad using the pad4pi library
 factory = Keypad.factory()

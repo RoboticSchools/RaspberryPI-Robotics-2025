@@ -10,6 +10,7 @@ import time
 import RPi.GPIO as GPIO
 from pad4pi import Keypad
 from RPLCD.i2c import CharLCD
+import sys
 
 # Initialize LCD (I2C address 0x27, 16x2 display)
 lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
@@ -23,8 +24,8 @@ KEYPAD = [
 ]
 
 # Define GPIO pins for keypad rows and columns
-ROW_PINS = [5, 6, 13, 19]  # Connected to Raspberry Pi GPIO
-COL_PINS = [12, 16, 20, 21]  # Connected to Raspberry Pi GPIO
+ROW_PINS = [5, 6, 13, 19] 
+COL_PINS = [12, 16, 20, 21] 
 
 # Initialize keypad using the pad4pi library
 factory = Keypad.factory()
@@ -36,7 +37,7 @@ vote_counts = {"A": 0, "B": 0, "C": 0, "D": 0}
 # Display initial message on LCD
 lcd.clear()
 lcd.write_string("Get Ready\nTo Vote!")
-time.sleep(2)
+time.sleep(3)
 lcd.clear()
 
 # Function to display voting options
@@ -69,7 +70,12 @@ def key_pressed(key):
         lcd.clear()
         lcd.write_string("Winner(s):\n" + " ".join(winners))
         time.sleep(5)
-        return  # Exit function to prevent infinite loop
+
+        GPIO.cleanup()
+        lcd.clear()
+        lcd.write_string("Voting Done")
+        time.sleep(2)
+        sys.exit()
 
     time.sleep(3)
     intro_vote()

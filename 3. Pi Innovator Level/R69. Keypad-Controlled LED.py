@@ -11,45 +11,43 @@ import RPi.GPIO as GPIO
 from pad4pi import Keypad
 import time
 
-# GPIO Pin Configuration
-LED_PIN = 18
+# setup led pin
+led_pin = 18
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(LED_PIN, GPIO.OUT)
+GPIO.setup(led_pin, GPIO.OUT)
 
-# Define the Keypad Layout
-KEYPAD = [
+# define keypad layout
+keypad_layout = [
     ["1", "2", "3", "A"],
     ["4", "5", "6", "B"],
     ["7", "8", "9", "C"],
     ["*", "0", "#", "D"]
 ]
 
-# Define GPIO Pins for Keypad Rows and Columns
-ROW_PINS = [5, 6, 13, 19]
-COL_PINS = [12, 16, 20, 21]
+# define gpio pins for keypad rows and columns
+row_pins = [5, 6, 13, 19]
+col_pins = [12, 16, 20, 21]
 
-# Initialize Keypad
+# initialize keypad
 factory = Keypad.factory()
-keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS)
+keypad = factory.create_keypad(keypad=keypad_layout, row_pins=row_pins, col_pins=col_pins)
 
-# Function to Handle Key Presses
+# handle key press
 def key_pressed(key):
     print(f"Key Pressed: {key}")
-    
     if key == "1":
-        GPIO.output(LED_PIN, GPIO.HIGH)  # Turn LED ON
+        GPIO.output(led_pin, GPIO.HIGH)
         print("LED ON")
     elif key == "0":
-        GPIO.output(LED_PIN, GPIO.LOW)   # Turn LED OFF
+        GPIO.output(led_pin, GPIO.LOW)
         print("LED OFF")
 
-# Register the Key Press Event
 keypad.registerKeyPressHandler(key_pressed)
 
+# main loop
 try:
     while True:
         time.sleep(0.1)
-
 except KeyboardInterrupt:
     print("Exiting...")
     GPIO.cleanup()

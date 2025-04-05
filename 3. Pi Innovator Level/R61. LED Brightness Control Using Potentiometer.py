@@ -1,31 +1,36 @@
 """
-LED Brightness Control using Potentiometer (ADS1115) on Raspberry Pi
+Components Used:
+- Raspberry Pi
+- ADS1115 Analog-to-Digital Converter
+- Potentiometer
+- LED
+- Jumper Wires
 """
 
 import time
 import board
 import busio
-import adafruit_ads1x15.ads1115 as ADS
+import adafruit_ads1x15.ads1115 as ads_module
 from adafruit_ads1x15.analog_in import AnalogIn
 import RPi.GPIO as GPIO
 
 # Define GPIO pin for LED PWM
-LED_PIN = 18  # Use hardware PWM pin
+led_pin = 21  # Use hardware PWM pin
 
 # Setup GPIO
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(LED_PIN, GPIO.OUT)
+GPIO.setup(led_pin, GPIO.OUT)
 
-# Initialize PWM on LED_PIN with 1000Hz frequency
-pwm = GPIO.PWM(LED_PIN, 1000)
+# Initialize PWM on led_pin with 1000Hz frequency
+pwm = GPIO.PWM(led_pin, 1000)
 pwm.start(0)  # Start with 0% brightness
 
 # Initialize I2C and ADS1115
 i2c = busio.I2C(board.SCL, board.SDA)
-ads = ADS.ADS1115(i2c)
+ads = ads_module.ADS1115(i2c)
 
 # Define potentiometer channel (connected to A0 on ADS1115)
-potentiometer = AnalogIn(ads, ADS.P0)
+potentiometer = AnalogIn(ads, ads_module.P0)
 
 try:
     print("Adjust potentiometer to control LED brightness...")
@@ -44,6 +49,6 @@ try:
         time.sleep(0.1)
 
 except KeyboardInterrupt:
-    print("\nExiting...")
+    print("Exiting...")
     pwm.stop()
     GPIO.cleanup()
