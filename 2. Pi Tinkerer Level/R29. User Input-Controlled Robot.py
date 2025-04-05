@@ -1,9 +1,9 @@
 """
 Components Used:
 - Raspberry Pi
-- UGeek DC Motor HAT
+- Pi DC Motor HAT
+- Robot Car Setup
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Jumper Wires
 """
 
 import time
@@ -13,16 +13,17 @@ from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
 mh = Raspi_MotorHAT(addr=0x6f)
 
 # Create motor objects for 4 motors
-rightFront = mh.getMotor(1)   # Right Front Motor
-rightBack = mh.getMotor(2)    # Right Back Motor
-leftFront = mh.getMotor(3)    # Left Front Motor
-leftBack = mh.getMotor(4)     # Left Back Motor
+rightFront = mh.getMotor(1)  
+rightBack = mh.getMotor(2)  
+leftFront = mh.getMotor(3) 
+leftBack = mh.getMotor(4)
 
-# Set initial motor speeds (can adjust based on need)
-rightFront.setSpeed(150)
-rightBack.setSpeed(150)
-leftFront.setSpeed(150)
-leftBack.setSpeed(150)
+# Set motors speed
+speed = 150
+rightFront.setSpeed(speed)
+rightBack.setSpeed(speed)
+leftFront.setSpeed(speed)
+leftBack.setSpeed(speed)
 
 # Function to move the robot forward
 def move_forward():

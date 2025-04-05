@@ -1,7 +1,7 @@
 """
 Components Used:
 - Raspberry Pi
-- Raspi Motor HAT
+- Pi DC Motor HAT
 - Robot Car setup
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
 """

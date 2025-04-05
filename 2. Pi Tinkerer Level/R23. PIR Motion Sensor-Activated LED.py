@@ -3,7 +3,6 @@ Components Used:
 - Raspberry Pi
 - PIR Motion Sensor
 - LED
-- Resistors
 - Breadboard
 - Jumper Wires
 """
@@ -12,8 +11,8 @@ import RPi.GPIO as gpio
 import time
 
 # Pin configuration
-pir_pin = 21  # GPIO21 connected to PIR sensor (Digital Output)
-led_pin = 20  # GPIO20 connected to LED
+pir_pin = 21
+led_pin = 20 
 
 # GPIO setup
 gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
@@ -22,7 +21,7 @@ gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
 
 try:
     while True:
-        if gpio.input(pir_pin) == gpio.HIGH:  # Motion detected
+        if gpio.input(pir_pin) == 1:  # Motion detected
             gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
             print("Motion Detected - LED ON")
         else:  # No motion
@@ -32,6 +31,4 @@ try:
         time.sleep(0.5)  # Small delay for stable readings
 
 except KeyboardInterrupt:
-    pass
-
-gpio.cleanup()  # Reset GPIO settings before exiting
+    gpio.cleanup()  # Reset GPIO settings before exiting

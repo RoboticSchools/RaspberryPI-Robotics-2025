@@ -1,10 +1,9 @@
 """
 Components Used:
 - Raspberry Pi
-- UGeek DC Motor HAT
+- Pi DC Motor HAT
 - DC Motor
 - Keyboard (Arrow Keys for Control)
-- Jumper Wires
 """
 
 import time
@@ -19,15 +18,12 @@ motor = mh.getMotor(3)
 motor.setSpeed(150)  # Set speed
 
 def on_press(key):
-    try:
-        if key == keyboard.Key.up:
-            print("Motor Forward")
-            motor.run(Raspi_MotorHAT.FORWARD)
-        elif key == keyboard.Key.down:
-            print("Motor Backward")
-            motor.run(Raspi_MotorHAT.BACKWARD)
-    except AttributeError:
-        pass
+    if key == keyboard.Key.up:
+        print("Motor Forward")
+        motor.run(Raspi_MotorHAT.FORWARD)
+    elif key == keyboard.Key.down:
+        print("Motor Backward")
+        motor.run(Raspi_MotorHAT.BACKWARD)
 
 def on_release(key):
     print("Motor Stopped")

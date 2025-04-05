@@ -1,15 +1,12 @@
 """
 Components Used:
 - Raspberry Pi
-- Raspi Motor HAT
+- Pi DC Motor HAT
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Breadboard
-- Jumper Wires
 - BlueDot App (for controlling the robot via Bluetooth)
 """
 
 from bluedot import BlueDot
-from gpiozero import Motor
 from time import sleep
 from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
 
@@ -28,6 +25,9 @@ rightFront.setSpeed(speed)
 rightBack.setSpeed(speed)
 leftFront.setSpeed(speed)
 leftBack.setSpeed(speed)
+
+# Create a BlueDot instance
+bd = BlueDot()
 
 # Define motor control functions
 def move_forward():
@@ -65,18 +65,15 @@ def stop_motors():
     leftFront.run(Raspi_MotorHAT.RELEASE)
     leftBack.run(Raspi_MotorHAT.RELEASE)
 
-# Create a BlueDot instance
-bd = BlueDot()
-
 # Define BlueDot button actions
 def on_press(pos):
-    if pos.top > 0.6:  # Up button
+    if pos.top:  # Up button
         move_forward()
-    elif pos.bottom < 0.4:  # Down button
+    elif pos.bottom:  # Down button
         move_backward()
-    elif pos.left < 0.4:  # Left button
+    elif pos.left:  # Left button
         turn_left()
-    elif pos.right > 0.6:  # Right button
+    elif pos.right:  # Right button
         turn_right()
 
 def on_release(pos):
@@ -86,5 +83,11 @@ def on_release(pos):
 bd.when_pressed = on_press
 bd.when_released = on_release
 
-# Keep the program running
-bd.wait_for_press()
+try:
+    print("Waiting for BlueDot input...")
+    while True:
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("Exiting...")
+    motor.run(Raspi_MotorHAT.RELEASE)

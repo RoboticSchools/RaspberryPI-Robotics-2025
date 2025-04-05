@@ -2,8 +2,6 @@
 Components Used:
 - Raspberry Pi
 - Servo Motor (SG90)
-- External Power Supply (if required)
-- Breadboard
 - Jumper Wires
 """
 
@@ -11,7 +9,7 @@ import time
 import RPi.GPIO as gpio
 
 # Servo Pin Configuration
-servo_pin = 21  # GPIO21 connected to Servo PWM
+servo_pin = 18  # GPIO18 connected to Servo PWM
 
 # GPIO Setup
 gpio.setmode(gpio.BCM)

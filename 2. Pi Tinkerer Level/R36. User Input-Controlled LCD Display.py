@@ -2,8 +2,6 @@
 Components Used:
 - Raspberry Pi
 - I2C LCD Display (16x2)
-- Keyboard Input
-- Breadboard
 - Jumper Wires
 """
 

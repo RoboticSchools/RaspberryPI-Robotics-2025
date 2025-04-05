@@ -1,7 +1,7 @@
 """
 Components Used:
 - Raspberry Pi
-- 2 LDR Sensors (Configured with Pull-down Resistors)
+- 2 LDR Sensors
 - Servo Motor
 - Breadboard
 - Jumper Wires
@@ -11,15 +11,15 @@ import time
 import RPi.GPIO as gpio
 
 # GPIO Pin configuration
-servo_pin = 18    # Servo motor connected to GPIO18 (PWM)
-right_sensor = 21  # Right LDR sensor connected to GPIO21
-left_sensor = 20   # Left LDR sensor connected to GPIO20
+servo_pin = 18
+right_sensor = 16
+left_sensor = 12
 
 # GPIO setup
 gpio.setmode(gpio.BCM)
-gpio.setup(right_sensor, gpio.IN)  # Set right LDR as input
-gpio.setup(left_sensor, gpio.IN)   # Set left LDR as input
-gpio.setup(servo_pin, gpio.OUT)    # Set servo pin as output
+gpio.setup(right_sensor, gpio.IN)
+gpio.setup(left_sensor, gpio.IN)
+gpio.setup(servo_pin, gpio.OUT)
 
 # Initialize PWM for servo control
 pwm = gpio.PWM(servo_pin, 50)  # 50Hz PWM frequency
@@ -39,11 +39,11 @@ move_servo(servo_angle)
 
 try:
     while True:
-        right_ldr = gpio.input(right_sensor)  # Read right LDR sensor
-        left_ldr = gpio.input(left_sensor)    # Read left LDR sensor
+        right_ldr = gpio.input(right_sensor)
+        left_ldr = gpio.input(left_sensor)
 
         # LDR sensor detects light as 0 (dark as 1)
-        if right_ldr == 0 and left_ldr == 1 and servo_angle < 180:
+        if left_ldr == 1 and right_ldr == 0 and servo_angle < 180:
             servo_angle += 1  # Move servo right
         elif left_ldr == 0 and right_ldr == 1 and servo_angle > 0:
             servo_angle -= 1  # Move servo left

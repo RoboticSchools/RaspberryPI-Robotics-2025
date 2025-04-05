@@ -4,7 +4,6 @@ Components Used:
 - I2C LCD Display (16x2)
 - Blynk App
 - Jumper Wires
-- Breadboard
 """
 
 import time

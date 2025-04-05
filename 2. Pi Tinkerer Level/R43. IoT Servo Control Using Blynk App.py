@@ -8,22 +8,23 @@ Components Used:
 
 import time
 import RPi.GPIO as gpio
-from BlynkLib import Blynk, VIRTUAL_WRITE
+from BlynkLib import Blynk
 
 # Blynk authentication token (replace with your actual token)
 BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"
 
-# GPIO setup
-SERVO_PIN = 18  # GPIO18 for PWM control
-gpio.setmode(gpio.BCM)
-gpio.setup(SERVO_PIN, gpio.OUT)
-
-# Start PWM on the servo pin at 50Hz
-servo = gpio.PWM(SERVO_PIN, 50)
-servo.start(0)
-
 # Initialize Blynk
 blynk = Blynk(BLYNK_AUTH)
+
+# GPIO setup
+servo_pin = 18  # GPIO18 connected to Servo PWM
+
+gpio.setmode(gpio.BCM)
+gpio.setup(servo_pin, gpio.OUT)
+
+# Start PWM on the servo pin at 50Hz
+servo = gpio.PWM(servo_pin, 50)
+servo.start(0)
 
 # Function to convert angle (0-180) to duty cycle
 def set_servo_angle(angle):

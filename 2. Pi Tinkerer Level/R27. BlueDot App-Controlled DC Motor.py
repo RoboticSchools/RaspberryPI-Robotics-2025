@@ -1,10 +1,9 @@
 """
 Components Used:
 - Raspberry Pi
-- UGeek DC Motor HAT
+- Pi DC Motor HAT
 - DC Motor
 - BlueDot App
-- Jumper Wires
 """
 
 import time

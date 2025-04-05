@@ -21,8 +21,8 @@ lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1, cols=16, rows=2, bac
 
 # GPIO Setup
 gpio.setmode(gpio.BCM)
-gpio.setup(button_a, gpio.IN, pull_up_down=gpio.PUD_UP)  # Pull-up for Button A
-gpio.setup(button_b, gpio.IN, pull_up_down=gpio.PUD_UP)  # Pull-up for Button B
+gpio.setup(button_a, gpio.IN, pull_up_down=gpio.PUD_UP)
+gpio.setup(button_b, gpio.IN, pull_up_down=gpio.PUD_UP)
 
 def generate_question():
     """Generate a multiplication question and shuffle options"""
@@ -50,11 +50,11 @@ while True:
     display_question(num1, num2, options)
 
     while True:
-        if gpio.input(button_a) == gpio.LOW:  # If Button A is pressed
+        if gpio.input(button_a) == 0:  # If Button A is pressed
             selected_answer = options[0]
             break
 
-        if gpio.input(button_b) == gpio.LOW:  # If Button B is pressed
+        if gpio.input(button_b) == 0:  # If Button B is pressed
             selected_answer = options[1]
             break
 

@@ -1,22 +1,15 @@
 """
 Components Used:
 - Raspberry Pi
-- Raspi Motor HAT
+- Pi DC Motor HAT
 - 2 LDR Sensors (Left and Right)
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Breadboard
 - Jumper Wires
 """
 
 import RPi.GPIO as GPIO
 import time
 from Raspi_MotorHAT import Raspi_MotorHAT
-
-# Setup GPIO mode and pins
-GPIO.setmode(GPIO.BCM)
-
-left_sensor_pin = 17  # LDR sensor connected to GPIO 17
-right_sensor_pin = 27  # LDR sensor connected to GPIO 27
 
 # Initialize Motor HAT (Default I2C address 0x6F)
 mh = Raspi_MotorHAT(addr=0x6f)
@@ -33,6 +26,12 @@ right_front_motor.setSpeed(speed)
 right_back_motor.setSpeed(speed)
 left_front_motor.setSpeed(speed)
 left_back_motor.setSpeed(speed)
+
+# Setup GPIO mode and pins
+GPIO.setmode(GPIO.BCM)
+
+left_sensor_pin = 17
+right_sensor_pin = 18
 
 # Set up the LDR sensor pins
 GPIO.setup(left_sensor_pin, GPIO.IN)
@@ -79,15 +78,12 @@ try:
         left_sensor = GPIO.input(left_sensor_pin)
         right_sensor = GPIO.input(right_sensor_pin)
 
-        if left_sensor == GPIO.HIGH and right_sensor == GPIO.LOW:
-            # Move right if the left sensor detects more light
-            turn_right()
-        elif left_sensor == GPIO.LOW and right_sensor == GPIO.HIGH:
-            # Move left if the right sensor detects more light
-            turn_left()
-        elif left_sensor == GPIO.HIGH and right_sensor == GPIO.HIGH:
-            # Move forward if both sensors detect light
+        if left_sensor == 0 and right_sensor == 0:  # Move forward if both sensors detect light
             move_forward()
+        elif left_sensor == 0 and right_sensor == 1:  # Move left if the left sensor detects more light
+            turn_left()
+        elif left_sensor == 1 and right_sensor == 0:   # Move right if the right sensor detects more light
+            turn_right()
         else:
             # Stop the motors if no light is detected
             stop_motors()

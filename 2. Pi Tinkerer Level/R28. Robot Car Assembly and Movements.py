@@ -1,9 +1,9 @@
 """
 Components Used:
 - Raspberry Pi
-- UGeek DC Motor HAT
+- Pi DC Motor HAT
+- Robot Car Setup
 - 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Jumper Wires
 """
 
 from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
@@ -69,12 +69,12 @@ def stop_motors():
 # Run the movements in a loop
 try:
     while True:
-        move_forward()    # Move forward for 2 seconds
-        move_backward()   # Move backward for 2 seconds
-        stop_motors()     # Stop for 2 seconds
-        turn_left()       # Turn left for 2 seconds
-        turn_right()      # Turn right for 2 seconds
-        stop_motors()     # Stop for 2 seconds
+        move_forward()    
+        move_backward()   
+        stop_motors()    
+        turn_left()      
+        turn_right()   
+        stop_motors()  
 
 except KeyboardInterrupt:
     print("Exiting program...")
