@@ -2,7 +2,7 @@
 Components Used:
 - Raspberry Pi
 - DHT11 Temperature Sensor
-- Motor Driver (L298N / Motor HAT)
+- Pi DC Motor HAT
 - DC Motor (Fan)
 - Red LED (High Temperature Warning)
 - Green LED (Normal Temperature Indicator)
@@ -18,53 +18,48 @@ from Raspi_MotorHAT import Raspi_MotorHAT
 GPIO.setmode(GPIO.BCM)
 
 # Define GPIO pins
-DHT_PIN = 17   # DHT11 sensor data pin
-RED_LED = 6    # Red LED for high temperature warning
-GREEN_LED = 5  # Green LED for normal temperature
+dht_pin = 17       # DHT11 sensor data pin
+red_led = 12       # Red LED for high temperature warning
+green_led = 16     # Green LED for normal temperature
 
 # Setup LEDs
-GPIO.setup(RED_LED, GPIO.OUT)
-GPIO.setup(GREEN_LED, GPIO.OUT)
+GPIO.setup(red_led, GPIO.OUT)
+GPIO.setup(green_led, GPIO.OUT)
 
 # Initialize DHT11 sensor
-dht_device = adafruit_dht.DHT11(DHT_PIN)
+dht_device = adafruit_dht.DHT11(dht_pin)
 
 # Initialize Motor HAT
-mh = Raspi_MotorHAT(addr=0x6f)
-fan = mh.getMotor(1)  # Fan connected to Motor Port 1
+motor_hat = Raspi_MotorHAT(addr=0x6f)
+fan = motor_hat.getMotor(1)  # Fan connected to Motor Port 1
 
 # Set fan speed
 fan.setSpeed(150)
 
 try:
     while True:
-        try:
-            # Read temperature from DHT11 sensor
-            temperature = dht_device.temperature
+        temperature = dht_device.temperature
 
-            if temperature is None:
-                print("Sensor error, retrying...")
-                continue
+        if temperature is None:
+            print("Sensor error, retrying...")
+            continue
 
-            print(f"Temperature: {temperature}°C")
+        print(f"Temperature: {temperature}°C")
 
-            if temperature > 27:
-                fan.run(Raspi_MotorHAT.FORWARD)  # Turn ON fan
-                GPIO.output(RED_LED, GPIO.HIGH)  # Turn ON red LED
-                GPIO.output(GREEN_LED, GPIO.LOW) # Turn OFF green LED
-                print("Fan ON - High Temperature!")
-            else:
-                fan.run(Raspi_MotorHAT.RELEASE)  # Turn OFF fan
-                GPIO.output(RED_LED, GPIO.LOW)   # Turn OFF red LED
-                GPIO.output(GREEN_LED, GPIO.HIGH) # Turn ON green LED
-                print("Fan OFF - Temperature Normal.")
+        if temperature > 27:
+            fan.run(Raspi_MotorHAT.FORWARD)
+            GPIO.output(red_led, GPIO.HIGH)
+            GPIO.output(green_led, GPIO.LOW)
+            print("Fan ON - High Temperature!")
+        else:
+            fan.run(Raspi_MotorHAT.RELEASE)
+            GPIO.output(red_led, GPIO.LOW)
+            GPIO.output(green_led, GPIO.HIGH)
+            print("Fan OFF - Temperature Normal.")
 
-        except Exception as e:
-            print(f"Error: {e}")
-
-        time.sleep(1)  # Delay before next reading
+        time.sleep(1)
 
 except KeyboardInterrupt:
     print("Exiting...")
-    fan.run(Raspi_MotorHAT.RELEASE)  # Stop the fan
-    GPIO.cleanup()  # Clean up GPIO settings
+    fan.run(Raspi_MotorHAT.RELEASE)
+    GPIO.cleanup()
