@@ -1,21 +1,15 @@
 """
 Components Used:
 - Raspberry Pi
-- Motor Driver (e.g., Motor HAT or L298N)
+- Pi DC Motor Hat
 - IR Sensor
 - Water Pump
-- Breadboard
 - Jumper Wires
 """
 
 import RPi.GPIO as GPIO
 import time
 from Raspi_MotorHAT import Raspi_MotorHAT
-
-# Setup GPIO mode and pins
-GPIO.setmode(GPIO.BCM)
-
-ir_sensor_pin = 17  # IR Sensor connected to GPIO 17 (or change to your specific GPIO pin)
 
 # Initialize Motor HAT (Default I2C address 0x6F)
 mh = Raspi_MotorHAT(addr=0x6f)
@@ -26,6 +20,9 @@ water_pump = mh.getMotor(1)
 # Set motor speed (0-255)
 water_pump.setSpeed(150)
 
+# Setup GPIO mode and pins
+GPIO.setmode(GPIO.BCM)
+ir_sensor_pin = 17
 # Set up the IR sensor pin
 GPIO.setup(ir_sensor_pin, GPIO.IN)
 
@@ -42,8 +39,8 @@ try:
         # Read the value from the IR sensor
         ir_sensor_value = GPIO.input(ir_sensor_pin)
 
-        if ir_sensor_value == GPIO.LOW:
-            # If IR sensor detects an object (GPIO.LOW)
+        if ir_sensor_value == 0:
+            # If IR sensor detects an object
             turn_on_water_pump()
             time.sleep(3)  # Keep the pump on for 3 seconds
             turn_off_water_pump()

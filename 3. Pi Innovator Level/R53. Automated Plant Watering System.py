@@ -1,7 +1,7 @@
 """
 Components Used:
 - Raspberry Pi
-- Motor Driver (e.g., Motor HAT or L298N)
+- Pi DC Motor HAT
 - Soil Moisture Sensor
 - Water Pump
 - ADS1115 ADC
@@ -46,7 +46,6 @@ try:
     while True:
         # Read the soil moisture value (analog value)
         moisture_value = channel.value
-        voltage = channel.voltage
 
         # Print the soil moisture value
         print(f"Soil Moisture Value: {moisture_value}")
@@ -54,7 +53,7 @@ try:
         # If soil moisture is below a threshold, turn on the water pump
         if moisture_value < 2000:  # Adjust this threshold based on your soil moisture sensor calibration
             turn_on_water_pump()
-            time.sleep(5)  # Run the pump for 5 seconds
+            time.sleep(3)  # Run the pump for 3 seconds
             turn_off_water_pump()
 
         # Wait for 1 second before the next reading

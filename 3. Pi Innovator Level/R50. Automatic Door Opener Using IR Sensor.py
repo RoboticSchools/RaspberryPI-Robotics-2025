@@ -1,9 +1,8 @@
 """
 Components Used:
 - Raspberry Pi
-- IR Sensor (Obstacle Sensor)
+- IR Sensor
 - Servo Motor (SG90)
-- Breadboard
 - Jumper Wires
 """
 

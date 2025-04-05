@@ -1,9 +1,8 @@
 """
 Components Used:
 - Raspberry Pi
-- Ultrasonic Sensor (HC-SR04)
+- Ultrasonic Sensor
 - Servo Motor (SG90)
-- Breadboard
 - Jumper Wires
 """
 
