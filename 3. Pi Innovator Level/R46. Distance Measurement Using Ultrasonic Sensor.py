@@ -10,28 +10,28 @@ import time
 import RPi.GPIO as gpio
 
 # GPIO Pin configuration
-trig = 23  # Trigger pin connected to GPIO23
-echo = 24  # Echo pin connected to GPIO24
+trig_pin = 23  # Trigger pin connected to GPIO23
+echo_pin = 24  # Echo pin connected to GPIO24
 
 # GPIO setup
 gpio.setmode(gpio.BCM)
-gpio.setup(trig, gpio.OUT)  # Set trig as output
-gpio.setup(echo, gpio.IN)   # Set echo as input
+gpio.setup(trig_pin, gpio.OUT)  # Set trig as output
+gpio.setup(echo_pin, gpio.IN)   # Set echo as input
 
 def get_distance():
     """Measure the distance using the ultrasonic sensor."""
     
     # Send a short pulse to trigger the sensor
-    gpio.output(trig, True)
+    gpio.output(trig_pin, True)
     time.sleep(0.00001)  # 10µs pulse
-    gpio.output(trig, False)
+    gpio.output(trig_pin, False)
 
     # Wait for the echo pin to go HIGH
-    while gpio.input(echo) == 0:
+    while gpio.input(echo_pin) == 0:
         start_time = time.time()
 
     # Wait for the echo pin to go LOW
-    while gpio.input(echo) == 1:
+    while gpio.input(echo_pin) == 1:
         end_time = time.time()
 
     # Calculate the distance in cm
