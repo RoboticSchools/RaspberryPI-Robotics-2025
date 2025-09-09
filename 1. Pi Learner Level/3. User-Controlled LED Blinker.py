@@ -1,30 +1,30 @@
-"""
-Components Used:
-- Raspberry Pi
-- LED  
-- Breadboard
-- Jumper Wires
-"""
+import RPi.GPIO as gpio   # Library to control Raspberry Pi GPIO pins (input/output)
+import time               # Library to manage delays and time-based functions
 
-import RPi.GPIO as gpio
-import time
+# --- Pin configuration ---
+led_pin = 21  # The GPIO pin number (BCM mode) where the LED is connected
 
-# Pin configuration
-led_pin = 21  # Use GPIO21
+# --- GPIO setup ---
+gpio.setmode(gpio.BCM)        # Set pin numbering system to BCM (Broadcom SOC channel)
+gpio.setup(led_pin, gpio.OUT) # Configure the LED pin to work as an output
 
-# GPIO setup
-gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+print("LED Blink Program Started (User Defined Number of Blinks)")
 
 try:
-    blink_count = int(input("Enter the number of times to blink the LED: "))
-    
-    for _ in range(blink_count):
-        print(f"Blink {blink_count}")
-        gpio.output(led_pin, gpio.HIGH)  # Turn the LED on
-        time.sleep(1)  # Wait for 1 second
-        gpio.output(led_pin, gpio.LOW)  # Turn the LED off
-        time.sleep(1)  # Wait for 1 second
+    # --- Ask the user how many times the LED should blink ---
+    blinks = int(input("Enter the number of times to blink the LED: "))
+
+    # --- Blink the LED for the given number of times ---
+    for i in range(blinks):
+        gpio.output(led_pin, gpio.HIGH)  # Send HIGH signal to turn the LED on
+        print(f"Blink {i+1}: LED is ON")
+        time.sleep(1)  # Keep LED on for 1 second
+
+        gpio.output(led_pin, gpio.LOW)   # Send LOW signal to turn the LED off
+        print(f"Blink {i+1}: LED is OFF")
+        time.sleep(1)  # Keep LED off for 1 second
 
 except KeyboardInterrupt:
-    gpio.cleanup()  # Reset GPIO settings on exit
+    # --- Cleanup on exit ---
+    print("\nProgram stopped by user. Cleaning up GPIO...")  
+    gpio.cleanup()  # Reset all GPIO settings to safe state
