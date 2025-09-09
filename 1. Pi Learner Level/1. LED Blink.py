@@ -1,27 +1,29 @@
-"""
-Components Used:
-- Raspberry Pi
-- LED  
-- Breadboard
-- Jumper Wires
-"""
+import RPi.GPIO as gpio   # Library to control Raspberry Pi GPIO pins
+import time               # Library to add delays (sleep) and track time
 
-import RPi.GPIO as gpio
-import time
+# --- Pin configuration ---
+led_pin = 21  # GPIO pin number connected to the LED (BCM numbering)
 
-# Pin configuration
-led_pin = 21  # Use GPIO21
+# --- GPIO setup ---
+gpio.setmode(gpio.BCM)        # Use Broadcom (BCM) pin numbering
+gpio.setup(led_pin, gpio.OUT) # Set the LED pin as an output pin
 
-# GPIO setup
-gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+print("LED Blink Program Started (Press CTRL+C to stop)")
 
 try:
     while True:
-        gpio.output(led_pin, gpio.HIGH)  # Turn the LED on
-        time.sleep(1)  # Wait for 1 second
-        gpio.output(led_pin, gpio.LOW)  # Turn the LED off
-        time.sleep(1)  # Wait for 1 second
+        # Turn LED ON
+        gpio.output(led_pin, gpio.HIGH)
+        print("LED is ON")
+        time.sleep(1)  # Keep LED on for 1 second
+
+        # Turn LED OFF
+        gpio.output(led_pin, gpio.LOW)
+        print("LED is OFF")
+        time.sleep(1)  # Keep LED off for 1 second
 
 except KeyboardInterrupt:
-    gpio.cleanup()  # Reset GPIO settings on exit
+    # Clean up GPIO settings before exiting
+    print("\nProgram stopped by user. Cleaning up GPIO...")
+    gpio.cleanup()
+    print("GPIO cleanup done. Goodbye!")
