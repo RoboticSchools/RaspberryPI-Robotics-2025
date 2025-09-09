@@ -1,33 +1,36 @@
-"""
-Components Used:
-- Raspberry Pi
-- LED  
-- Breadboard
-- Jumper Wires
-"""
+import RPi.GPIO as gpio   # Library to control Raspberry Pi GPIO pins (input/output)
 
-import RPi.GPIO as gpio
-import time
+# --- Pin configuration ---
+led_pin = 21  # The GPIO pin number (BCM mode) where the LED is connected
 
-# Pin configuration
-led_pin = 21  # Use GPIO21
+# --- GPIO setup ---
+gpio.setmode(gpio.BCM)        # Set pin numbering system to BCM (Broadcom SOC channel)
+gpio.setup(led_pin, gpio.OUT) # Configure the LED pin to work as an output
 
-# GPIO setup
-gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+print("User Input Controlled LED Program Started (Type 'on', 'off', or 'exit')")
 
 try:
     while True:
-        user_input = input("Enter 'on' to turn on LED, 'off' to turn off, or 'exit' to quit: ").lower()
-        
-        if user_input == "on":
-            gpio.output(led_pin, gpio.HIGH)  # Turn the LED on
-        elif user_input == "off":
-            gpio.output(led_pin, gpio.LOW)  # Turn the LED off
-        elif user_input == "exit":
-            break
+        # --- Ask the user for input ---
+        command = input("Enter command: ").lower()
+
+        # --- Control LED based on user input ---
+        if command == "on":
+            gpio.output(led_pin, gpio.HIGH)  # Send HIGH signal to turn the LED on
+            print("LED is ON")
+
+        elif command == "off":
+            gpio.output(led_pin, gpio.LOW)   # Send LOW signal to turn the LED off
+            print("LED is OFF")
+
+        elif command == "exit":
+            print("Exiting program...")
+            break  # Exit the loop
+
         else:
-            print("Invalid input! Please enter 'on', 'off', or 'exit'.")
+            print("Invalid command. Please type 'on', 'off', or 'exit'.")
 
 except KeyboardInterrupt:
-    gpio.cleanup()  # Reset GPIO settings on exit
+    # --- Cleanup on exit ---
+    print("\nProgram stopped by user. Cleaning up GPIO...")  
+    gpio.cleanup()  # Reset all GPIO settings to safe state
