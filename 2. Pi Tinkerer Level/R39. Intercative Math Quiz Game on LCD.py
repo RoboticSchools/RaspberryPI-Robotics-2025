@@ -12,58 +12,64 @@ import random
 import RPi.GPIO as gpio
 from RPLCD.i2c import CharLCD
 
-# Pin Configuration
-button_a = 20  # GPIO20 - Button for Option A
-button_b = 16  # GPIO16 - Button for Option B
+button_a = 20
+button_b = 16
 
-# Initialize I2C LCD (Address 0x27 or 0x3F, check using `i2cdetect -y 1`)
-lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1, cols=16, rows=2, backlight_enabled=True)
+lcd = CharLCD(i2c_expander='PCF8574',
+              address=0x27,
+              port=1,
+              cols=16,
+              rows=2,
+              backlight_enabled=True)
 
-# GPIO Setup
 gpio.setmode(gpio.BCM)
 gpio.setup(button_a, gpio.IN, pull_up_down=gpio.PUD_UP)
 gpio.setup(button_b, gpio.IN, pull_up_down=gpio.PUD_UP)
 
 def generate_question():
-    """Generate a multiplication question and shuffle options"""
     num1 = random.randint(1, 10)
     num2 = random.randint(1, 10)
     correct_answer = num1 * num2
-    wrong_answer = correct_answer + random.randint(5, 10)  # Wrong answer is 5-10 more
+    wrong_answer = correct_answer + random.randint(5, 10)
 
     options = [correct_answer, wrong_answer]
-    random.shuffle(options)  # Shuffle options
+    random.shuffle(options)
 
     return num1, num2, options, correct_answer
 
 def display_question(num1, num2, options):
-    """Display question & options on LCD"""
     lcd.clear()
     lcd.cursor_pos = (0, 0)
-    lcd.write_string(f"{num1} x {num2} = ?")  # Question on first row
+    lcd.write_string(f"{num1} x {num2} = ?")
     lcd.cursor_pos = (1, 0)
-    lcd.write_string(f"A:{options[0]} B:{options[1]}")  # Options on second row
+    lcd.write_string(f"A:{options[0]} B:{options[1]}")
 
-# Game Loop
-while True:
-    num1, num2, options, correct_answer = generate_question()
-    display_question(num1, num2, options)
-
+try:
     while True:
-        if gpio.input(button_a) == 0:  # If Button A is pressed
-            selected_answer = options[0]
-            break
+        num1, num2, options, correct_answer = generate_question()
+        display_question(num1, num2, options)
 
-        if gpio.input(button_b) == 0:  # If Button B is pressed
-            selected_answer = options[1]
-            break
+        while True:
+            if gpio.input(button_a) == 0:
+                selected_answer = options[0]
+                time.sleep(0.3)
+                break
 
-    # Display result
+            if gpio.input(button_b) == 0:
+                selected_answer = options[1]
+                time.sleep(0.3)
+                break
+
+        lcd.clear()
+        lcd.cursor_pos = (0, 0)
+
+        if selected_answer == correct_answer:
+            lcd.write_string("Correct!")
+        else:
+            lcd.write_string("Wrong!")
+
+        time.sleep(2)
+
+except KeyboardInterrupt:
     lcd.clear()
-    lcd.cursor_pos = (0, 0)
-    if selected_answer == correct_answer:
-        lcd.write_string("Correct! 🎉")
-    else:
-        lcd.write_string("Wrong! ❌")
-
-    time.sleep(2)  # Wait before next question
+    gpio.cleanup()
