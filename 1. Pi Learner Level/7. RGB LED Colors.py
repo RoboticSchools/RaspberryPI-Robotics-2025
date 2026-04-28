@@ -1,75 +1,58 @@
-"""
-Components Used:
-- Raspberry Pi
-- RGB LED (Common Cathode)
-- Breadboard
-- Jumper Wires
-"""
-
 import RPi.GPIO as gpio
 import time
 
-# Pin configuration
-red_pin = 21   
-green_pin = 20 
-blue_pin = 16  
+red_pin = 21    # GPIO pin for red LED
+green_pin = 20  # GPIO pin for green LED
+blue_pin = 16   # GPIO pin for blue LED
 
-# GPIO setup
-gpio.setmode(gpio.BCM)  # Set pin numbering system to BCM
-gpio.setup(red_pin, gpio.OUT)  
-gpio.setup(green_pin, gpio.OUT) 
-gpio.setup(blue_pin, gpio.OUT)
+gpio.setmode(gpio.BCM)           # Use BCM pin numbering
+gpio.setup(red_pin, gpio.OUT)    # Set red pin as output
+gpio.setup(green_pin, gpio.OUT)  # Set green pin as output
+gpio.setup(blue_pin, gpio.OUT)   # Set blue pin as output
 
 try:
     while True:
-        # Red color
-        gpio.output(red_pin, gpio.HIGH)
+        gpio.output(red_pin, gpio.HIGH)    # Red ON
         gpio.output(green_pin, gpio.LOW)
         gpio.output(blue_pin, gpio.LOW)
         print("Red")
-        time.sleep(1)
+        time.sleep(1)  # Wait 1 second
 
-        # Green color
         gpio.output(red_pin, gpio.LOW)
-        gpio.output(green_pin, gpio.HIGH)
+        gpio.output(green_pin, gpio.HIGH)  # Green ON
         gpio.output(blue_pin, gpio.LOW)
         print("Green")
         time.sleep(1)
 
-        # Blue color
         gpio.output(red_pin, gpio.LOW)
         gpio.output(green_pin, gpio.LOW)
-        gpio.output(blue_pin, gpio.HIGH)
+        gpio.output(blue_pin, gpio.HIGH)   # Blue ON
         print("Blue")
         time.sleep(1)
 
-        # Yellow color (Red + Green)
-        gpio.output(red_pin, gpio.HIGH)
+        gpio.output(red_pin, gpio.HIGH)    # Red + Green = Yellow
         gpio.output(green_pin, gpio.HIGH)
         gpio.output(blue_pin, gpio.LOW)
         print("Yellow")
         time.sleep(1)
 
-        # Magenta color (Red + Blue)
-        gpio.output(red_pin, gpio.HIGH)
+        gpio.output(red_pin, gpio.HIGH)    # Red + Blue = Magenta
         gpio.output(green_pin, gpio.LOW)
         gpio.output(blue_pin, gpio.HIGH)
         print("Magenta")
         time.sleep(1)
 
-        # Cyan color (Green + Blue)
         gpio.output(red_pin, gpio.LOW)
-        gpio.output(green_pin, gpio.HIGH)
+        gpio.output(green_pin, gpio.HIGH)  # Green + Blue = Cyan
         gpio.output(blue_pin, gpio.HIGH)
         print("Cyan")
         time.sleep(1)
 
-        # White color (Red + Green + Blue)
-        gpio.output(red_pin, gpio.HIGH)
+        gpio.output(red_pin, gpio.HIGH)    # Red + Green + Blue = White
         gpio.output(green_pin, gpio.HIGH)
         gpio.output(blue_pin, gpio.HIGH)
         print("White")
         time.sleep(1)
 
 except KeyboardInterrupt:
-    gpio.cleanup()  # Reset GPIO settings on exit
+    gpio.cleanup()  # Reset GPIO on exit
