@@ -3,15 +3,16 @@ Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
 3. DC Motor
-4. BlueDot App
+4. Battery Holder with 18650 Batteries
+5. BlueDot App
 
 Install Required Library:
 pip install bluedot --break-system-packages
 """
 
-import time
 from bluedot import BlueDot
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 

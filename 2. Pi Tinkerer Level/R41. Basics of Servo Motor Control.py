@@ -1,33 +1,29 @@
 """
 Components Used:
 1. Raspberry Pi
-2. Servo Motor (SG90)
-3. Jumper Wires
+2. DC Motor HAT
+3. Servo Motor
+4. Jumper Wires
 """
 
+from Raspi_PWM_Servo_Driver import PWM
 import time
-import RPi.GPIO as gpio
+import numpy as np  # for mapping
 
-servo_pin = 18  # GPIO pin for servo
+pwm = PWM(0x6F)          # initialize PWM driver
+pwm.setPWMFreq(60)       # set frequency for servo
 
-gpio.setmode(gpio.BCM)        # Use BCM numbering
-gpio.setup(servo_pin, gpio.OUT)  # Set servo pin as output
+channel = 0              # servo channel
 
-servo = gpio.PWM(servo_pin, 50)  # 50Hz PWM for servo
-servo.start(0)  # Start PWM
+def angle_to_pwm(angle):
+    return int(np.interp(angle, [0, 180], [150, 600]))  # map using numpy
 
-def set_angle(angle):
-    duty_cycle = 2 + (angle / 18)  # Convert angle to duty cycle
-    servo.ChangeDutyCycle(duty_cycle)  # Move servo
-    time.sleep(1)  # Wait to reach position
-    servo.ChangeDutyCycle(0)  # Stop signal (reduce jitter)
+while True:
+    pwm.setPWM(channel, 0, angle_to_pwm(0))    # 0°
+    time.sleep(1)
 
-try:
-    while True:
-        set_angle(0)    # Move to 0°
-        set_angle(90)   # Move to 90°
-        set_angle(180)  # Move to 180°
+    pwm.setPWM(channel, 0, angle_to_pwm(90))   # 90°
+    time.sleep(1)
 
-except KeyboardInterrupt:
-    servo.stop()     # Stop PWM
-    gpio.cleanup()   # Reset GPIO
+    pwm.setPWM(channel, 0, angle_to_pwm(180))  # 180°
+    time.sleep(1)

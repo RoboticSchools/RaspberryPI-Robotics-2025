@@ -18,23 +18,31 @@ Common addresses:
 import time
 from RPLCD.i2c import CharLCD
 
-# Initialize LCD (change address if needed)
-lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
+lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)  # LCD init
 
-def scroll_text(text):
-    text = text + " " * 16  # Add padding for smooth scroll
+def scroll_text(text, row, direction):
+    text = text + " " * 16  # add spaces for smooth scrolling
 
-    for i in range(len(text) - 15):
-        lcd.cursor_pos = (0, 0)          # First row
-        lcd.write_string(text[i:i+16])   # Show 16 chars
-        time.sleep(0.3)                  # Scroll speed
+    if direction == "left":
+        for i in range(len(text) - 15):
+            lcd.cursor_pos = (row, 0)            # set row position
+            lcd.write_string(text[i:i+16])       # display 16 chars
+            time.sleep(0.3)                      # scroll speed
+
+    elif direction == "right":
+        for i in range(len(text) - 15):
+            lcd.cursor_pos = (row, 0)
+            lcd.write_string(text[::-1][i:i+16][::-1])  # reverse scroll
+            time.sleep(0.3)
 
 try:
     while True:
-        user_text = input("Enter text to display: ")  # Get input
+        user_text = input("Enter text: ")              # get text
+        row = int(input("Enter row (0 or 1): "))       # select row
+        direction = input("Direction (left/right): ").lower()  # scroll direction
 
-        lcd.clear()          # Clear display
-        scroll_text(user_text)  # Scroll text
+        lcd.clear()                # clear display
+        scroll_text(user_text, row, direction)  # call function
 
 except KeyboardInterrupt:
-    lcd.clear()  # Clear display on exit
+    lcd.clear()  # clear on exit

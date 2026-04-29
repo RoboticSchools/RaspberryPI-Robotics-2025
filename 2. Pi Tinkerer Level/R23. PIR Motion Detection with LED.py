@@ -11,7 +11,7 @@ import RPi.GPIO as gpio
 import time
 
 pir_pin = 21  # GPIO pin for PIR sensor
-led_pin = 20  # GPIO pin for LED
+led_pin = 16  # GPIO pin for LED
 
 gpio.setmode(gpio.BCM)         # Use BCM pin numbering
 gpio.setup(pir_pin, gpio.IN)   # Set PIR as input

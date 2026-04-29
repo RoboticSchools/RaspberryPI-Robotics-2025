@@ -3,15 +3,16 @@ Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
 3. DC Motor
-4. Keyboard (Arrow Keys)
+4. Battery Holder with 18650 Batteries
+5. Keyboard (Arrow Keys)
 
 Install Required Library:
 pip install pynput --break-system-packages
 """
 
-import time
 from pynput import keyboard
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 

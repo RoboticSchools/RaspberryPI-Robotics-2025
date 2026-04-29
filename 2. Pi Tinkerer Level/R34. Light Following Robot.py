@@ -4,12 +4,13 @@ Components Used:
 2. DC Motor HAT
 3. 2 LDR Sensors (Left & Right)
 4. Robot Car (4 DC Motors)
-5. Jumper Wires
+5. Battery Holder with 18650 Batteries
+6. Jumper Wires
 """
 
 import RPi.GPIO as gpio
-import time
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 

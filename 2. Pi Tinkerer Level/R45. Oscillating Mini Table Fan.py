@@ -4,83 +4,73 @@ Components Used:
 2. DC Motor HAT
 3. DC Motor
 4. Servo Motor
-5. 3 Push Buttons
+5. Push Button
 6. Breadboard
 7. Jumper Wires
 """
 
 import RPi.GPIO as gpio
-import time
 from Raspi_MotorHAT import Raspi_MotorHAT
+from Raspi_PWM_Servo_Driver import PWM
+import numpy as np
+import time
 
-mh = Raspi_MotorHAT(addr=0x6f)  # Motor HAT
+# Motor setup
+motor_hat = Raspi_MotorHAT(addr=0x6f)
+dc_motor = motor_hat.getMotor(1)
 
-fanMotor = mh.getMotor(1)  # DC motor
+# Servo setup (PCA9685)
+pwm_driver = PWM(0x6F)
+pwm_driver.setPWMFreq(60)
+servo_channel = 0
 
-buttonOn = 12
-buttonOff = 16
-servoButton = 21
-
+# Button setup
+button_pin = 12
 gpio.setmode(gpio.BCM)
-gpio.setup(buttonOn, gpio.IN, pull_up_down=gpio.PUD_UP)
-gpio.setup(buttonOff, gpio.IN, pull_up_down=gpio.PUD_UP)
-gpio.setup(servoButton, gpio.IN, pull_up_down=gpio.PUD_UP)
+gpio.setup(button_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
 
-servoPin = 18
-gpio.setup(servoPin, gpio.OUT)
+# State variables
+system_on = False
+last_button_state = 1
+servo_angle = 0
+servo_direction = 1
 
-servo = gpio.PWM(servoPin, 50)
-servo.start(0)
-
-servoRunning = False
-servoAngle = 0
-direction = 1  # 1 = forward, -1 = backward
-
-def update_servo():
-    global servoAngle, direction
-
-    servoAngle += direction * 2
-
-    if servoAngle >= 180:
-        servoAngle = 180
-        direction = -1
-
-    elif servoAngle <= 0:
-        servoAngle = 0
-        direction = 1
-
-    duty = 2 + (servoAngle / 18)
-    servo.ChangeDutyCycle(duty)
-    time.sleep(0.02)
-    servo.ChangeDutyCycle(0)
+# Move servo using angle → PWM mapping
+def move_servo(angle):
+    pulse = int(np.interp(angle, [0, 180], [150, 600]))
+    pwm_driver.setPWM(servo_channel, 0, pulse)
 
 try:
     while True:
-        if gpio.input(buttonOn) == 0:
-            fanMotor.setSpeed(255)
-            fanMotor.run(Raspi_MotorHAT.FORWARD)
-            servoRunning = True
-            print("Motor ON + Servo Start")
-            time.sleep(0.3)
+        button_state = gpio.input(button_pin)
 
-        if gpio.input(buttonOff) == 0:
-            fanMotor.run(Raspi_MotorHAT.RELEASE)
-            servoRunning = False
-            print("Motor OFF + Servo Stop")
-            time.sleep(0.3)
+        # Toggle system on button press
+        if last_button_state == 1 and button_state == 0:
+            system_on = not system_on
 
-        if gpio.input(servoButton) == 0:
-            servoRunning = not servoRunning
-            print("Servo Toggle:", "ON" if servoRunning else "OFF")
-            time.sleep(0.3)
+            if system_on:
+                dc_motor.setSpeed(255)
+                dc_motor.run(Raspi_MotorHAT.FORWARD)
+                print("System ON")
+            else:
+                dc_motor.run(Raspi_MotorHAT.RELEASE)
+                print("System OFF")
 
-        if servoRunning:
-            update_servo()
+            time.sleep(0.3)  # debounce
+
+        last_button_state = button_state
+
+        # Servo oscillation
+        if system_on:
+            servo_angle += servo_direction * 2
+
+            if servo_angle >= 180 or servo_angle <= 0:
+                servo_direction *= -1
+
+            move_servo(servo_angle)
 
         time.sleep(0.02)
 
 except KeyboardInterrupt:
-    print("Exiting...")
-    servo.stop()
-    fanMotor.run(Raspi_MotorHAT.RELEASE)
+    dc_motor.run(Raspi_MotorHAT.RELEASE)
     gpio.cleanup()

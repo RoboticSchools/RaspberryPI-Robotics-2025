@@ -19,7 +19,9 @@ gpio.setup(led_pin, gpio.OUT) # Set LED as output
 
 try:
     while True:
-        if gpio.input(ldr_pin) == 1:  # Check dark condition
+        ldr_value = gpio.input(ldr_pin)  # Read LDR value
+
+        if ldr_value == 1:  # Check dark condition
             gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
             print("Dark detected - LED ON")
         else:

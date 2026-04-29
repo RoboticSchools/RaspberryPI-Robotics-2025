@@ -17,10 +17,10 @@ Common addresses:
 0x27 or 0x3F
 """
 
-import time
-import random
 import RPi.GPIO as gpio
 from RPLCD.i2c import CharLCD
+import time
+import random
 
 button_a = 20  # Button A
 button_b = 16  # Button B

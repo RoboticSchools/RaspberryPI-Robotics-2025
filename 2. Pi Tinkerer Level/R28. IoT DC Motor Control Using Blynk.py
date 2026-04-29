@@ -3,15 +3,16 @@ Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
 3. DC Motor
-4. Blynk App
+4. Battery Holder with 18650 Batteries
+5. Blynk App
 
 Install Required Library:
 pip install blynklib --break-system-packages
 """
 
-import time
 from BlynkLib import Blynk
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"  # Enter your Blynk auth token
 
@@ -48,12 +49,6 @@ def backward_handler(value):
     if int(value[0]) == 1:
         move_backward()
     else:
-        stop_motor()
-
-# Called when Stop button (V3) is pressed
-@blynk.on("V3")
-def stop_handler(value):
-    if int(value[0]) == 1:
         stop_motor()
 
 try:

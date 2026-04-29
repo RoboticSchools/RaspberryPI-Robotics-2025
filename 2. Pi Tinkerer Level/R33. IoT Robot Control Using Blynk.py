@@ -3,15 +3,16 @@ Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
 3. Robot Car (4 DC Motors)
-4. Blynk App (IoT Control)
+4. Battery Holder with 18650 Batteries
+5. Blynk App (IoT Control)
 
 Install Required Library:
 pip install blynklib --break-system-packages
 """
 
-import time
 from BlynkLib import Blynk
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"  # Enter your Blynk token
 
@@ -99,12 +100,6 @@ def right_handler(value):
     if int(value[0]) == 1:
         turn_right()
     else:
-        stop_motors()
-
-# Stop button (V5)
-@blynk.on("V5")
-def stop_handler(value):
-    if int(value[0]) == 1:
         stop_motors()
 
 try:

@@ -2,53 +2,50 @@
 Components Used:
 1. Raspberry Pi
 2. 2 LDR Sensors (Left & Right)
-3. Servo Motor (SG90)
-4. Breadboard
-5. Jumper Wires
+3. DC Motor Hat
+4. Servo Motor
+5. Breadboard
+6. Jumper Wires
 """
 
-import time
 import RPi.GPIO as gpio
+import numpy as np
+import time
+from Raspi_PWM_Servo_Driver import PWM
 
-servo_pin = 18      # Servo pin
-right_sensor = 16   # Right LDR
-left_sensor = 12    # Left LDR
+right_sensor = 16     # right LDR
+left_sensor = 12      # left LDR
 
-gpio.setmode(gpio.BCM)  # Use BCM numbering
+gpio.setmode(gpio.BCM)
 gpio.setup(right_sensor, gpio.IN)
 gpio.setup(left_sensor, gpio.IN)
-gpio.setup(servo_pin, gpio.OUT)
 
-pwm = gpio.PWM(servo_pin, 50)  # 50Hz for servo
-pwm.start(0)
+pwm = PWM(0x6F)       # init driver
+pwm.setPWMFreq(60)    # servo frequency
 
-servo_angle = 90  # Start from center
+channel = 0           # servo channel
+servo_angle = 90      # start center
 
 def move_servo(angle):
-    duty_cycle = 2 + (angle / 18)  # Convert angle
-    pwm.ChangeDutyCycle(duty_cycle)
-    time.sleep(0.03)
-    pwm.ChangeDutyCycle(0)  # Reduce jitter
+    pulse = int(np.interp(angle, [0, 180], [150, 600]))  # angle → PWM
+    pwm.setPWM(channel, 0, pulse)
 
-# Initial position
-move_servo(servo_angle)
+move_servo(servo_angle)  # initial position
 
 try:
     while True:
-        right_ldr = gpio.input(right_sensor)
-        left_ldr = gpio.input(left_sensor)
+        right_ldr = gpio.input(right_sensor)  # read right
+        left_ldr = gpio.input(left_sensor)    # read left
 
-        # Logic: move towards light
+        # move towards brighter side
         if left_ldr == 1 and right_ldr == 0 and servo_angle < 180:
-            servo_angle += 1  # Move right
+            servo_angle += 1
 
         elif left_ldr == 0 and right_ldr == 1 and servo_angle > 0:
-            servo_angle -= 1  # Move left
+            servo_angle -= 1
 
-        move_servo(servo_angle)  # Update position
-        time.sleep(0.02)  # Smooth movement
+        move_servo(servo_angle)  # update position
+        time.sleep(0.02)
 
 except KeyboardInterrupt:
-    print("Exiting...")
-    pwm.stop()
     gpio.cleanup()

@@ -2,8 +2,8 @@
 Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
-3. Robot Car
-4. 4 DC Motors
+3. Robot Car (4 DC Motors)
+4. Battery Holder with 18650 Batteries
 5. Keyboard
 
 Install Required Library:
