@@ -25,24 +25,20 @@ def led_off():
     gpio.output(led_pin, gpio.LOW)   # Turn LED OFF
     label.configure(text="LED is OFF")  # Update label
 
-ctk.set_appearance_mode("light")  # Set theme
-ctk.set_default_color_theme("blue")
-
 window = ctk.CTk()  # Create window
 window.title("LED Controller")
-window.geometry("500x300")
+window.geometry("500x320")
 
-button_on = ctk.CTkButton(window, text="LED ON", command=led_on,
-                          width=200, height=50)  # ON button
+# ON button
+button_on = ctk.CTkButton(window,text="LED ON",command=led_on,fg_color="green",font=("Arial", 18),width=200,height=50)
 button_on.pack(pady=20)
 
-button_off = ctk.CTkButton(window, text="LED OFF", command=led_off,
-                           fg_color="red", hover_color="#cc0000",
-                           width=200, height=50)  # OFF button
+# OFF button
+button_off = ctk.CTkButton(window,text="LED OFF",command=led_off,fg_color="red",font=("Arial", 18),width=200,height=50)
 button_off.pack(pady=20)
 
-label = ctk.CTkLabel(window, text="LED is OFF",
-                     font=("Arial", 16))  # Status label
+# Status label
+label = ctk.CTkLabel(window,text="LED is OFF",font=("Arial", 18))
 label.pack(pady=10)
 
 try:
