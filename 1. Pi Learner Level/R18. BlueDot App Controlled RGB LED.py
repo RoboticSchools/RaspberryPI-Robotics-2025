@@ -4,6 +4,7 @@ Components Used:
 2. RGB LED
 3. Breadboard
 4. Jumper Wires
+5. Android Mobile (BlueDot App)
 
 Install Required Library:
 pip install bluedot --break-system-packages
