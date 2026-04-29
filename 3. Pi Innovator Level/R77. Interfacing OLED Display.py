@@ -1,8 +1,8 @@
 """
 Components Used:
-- Raspberry Pi
-- OLED Display (128x64) using SSD1306 (I2C)
-- Jumper Wires
+1. Raspberry Pi
+2. OLED Display (128x64, SSD1306 I2C)
+3. Jumper Wires
 """
 
 import time
@@ -11,30 +11,28 @@ import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
-# Initialize I2C interface
-i2c = busio.I2C(board.SCL, board.SDA)
+# I2C setup
+i2c = busio.I2C(board.SCL, board.SDA)  # init I2C
 
-# Create SSD1306 display object
-oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
+# OLED setup
+oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)  # init display
 
-# Clear the display
-oled.fill(0)
+oled.fill(0)  # clear display
 oled.show()
 
-# Create an image buffer
-width = oled.width
-height = oled.height
-image = Image.new("1", (width, height))
-draw = ImageDraw.Draw(image)
+# create image buffer
+width, height = oled.width, oled.height
+image = Image.new("1", (width, height))  # create blank image
+draw = ImageDraw.Draw(image)  # draw object
 
-# Load a font
-font = ImageFont.load_default()
+# load font
+font = ImageFont.load_default()  # default font
 
-# Draw text
-draw.text((10, 20), "Hello, Raspberry Pi!", font=font, fill=255)
+# draw text
+draw.text((10, 20), "Hello, Raspberry Pi!", font=font, fill=255)  # add text
 
-# Display the image on the OLED
-oled.image(image)
-oled.show()
+# display on OLED
+oled.image(image)  # send image
+oled.show()        # update display
 
-time.sleep(5)  # Display for 5 seconds
+time.sleep(5)  # wait 5 seconds

@@ -1,43 +1,48 @@
 """
 Components Used:
-- Raspberry Pi
-- Pi DC Motor HAT
-- DC Motor
-- Potentiometer
-- ADS1115 ADC (to read potentiometer analog values)
-- Jumper Wires
+1. Raspberry Pi
+2. DC Motor HAT
+3. DC Motor
+4. Potentiometer
+5. ADS1115 ADC
+6. Jumper Wires
 """
 
 import time
-import busio
 import board
-from adafruit_ads1x15.ads1115 import ADS1115
-from adafruit_ads1x15.analog_in import AnalogIn
+import busio
+import numpy as np
 from Raspi_MotorHAT import Raspi_MotorHAT
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
 
-# initialize i2c for ads1115
+# ---------------- ADS1115 Setup ----------------
 i2c = busio.I2C(board.SCL, board.SDA)
-ads = ADS1115(i2c)
-pot_channel = AnalogIn(ads, ADS1115.P0)
+ads = ADS.ADS1115(i2c)
 
-# initialize motor HAT and motor on port 1
-mh = Raspi_MotorHAT(addr=0x6f)
-motor = mh.getMotor(1)
+potentiometer = AnalogIn(ads, ADS.P0)  # potentiometer on A0
 
+# ---------------- Motor Setup ----------------
+motor_hat = Raspi_MotorHAT(addr=0x6f)
+dc_motor = motor_hat.getMotor(1)
+
+# ---------------- Main Loop ----------------
 try:
-    print("DC motor speed control started...")
+    print("DC Motor Speed Control Started...")
 
-    # main loop to control motor speed using potentiometer
     while True:
-        pot_value = pot_channel.value
-        motor_speed = int((pot_value * 255) / 65535)
+        pot_value = potentiometer.value  # read analog value
 
-        motor.setSpeed(motor_speed)
-        motor.run(Raspi_MotorHAT.FORWARD)
+        # map 0–65535 → 0–255 using numpy
+        motor_speed = int(np.interp(pot_value, [0, 65535], [0, 255]))
+
+        dc_motor.setSpeed(motor_speed)                 # set speed
+        dc_motor.run(Raspi_MotorHAT.FORWARD)           # run motor
 
         print(f"Motor Speed: {motor_speed}")
+
         time.sleep(0.1)
 
 except KeyboardInterrupt:
-    motor.run(Raspi_MotorHAT.RELEASE)
-    print("Motor stopped.")
+    print("Exiting...")
+    dc_motor.run(Raspi_MotorHAT.RELEASE)  # stop motor

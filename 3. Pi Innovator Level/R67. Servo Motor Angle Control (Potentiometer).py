@@ -1,48 +1,50 @@
 """
 Components Used:
-- Raspberry Pi
-- Servo Motor
-- Potentiometer
-- ADS1115 ADC (to read potentiometer analog values)
-- Jumper Wires
+1. Raspberry Pi
+2. Servo Motor (PCA9685)
+3. Potentiometer
+4. ADS1115 ADC
+5. Jumper Wires
 """
 
 import time
-import busio
 import board
-import RPi.GPIO as GPIO
-from adafruit_ads1x15.ads1115 import ADS1115
+import busio
+import numpy as np
+from Raspi_PWM_Servo_Driver import PWM
+import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
-# setup GPIO pin for servo motor
-servo_pin = 18
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(servo_pin, GPIO.OUT)
-
-# initialize PWM on the servo pin (50Hz for servo motors)
-pwm = GPIO.PWM(servo_pin, 50)
-pwm.start(0)
-
-# setup i2c and ads1115 adc for potentiometer
+# ---------------- ADS1115 Setup ----------------
 i2c = busio.I2C(board.SCL, board.SDA)
-ads = ADS1115(i2c)
-pot_channel = AnalogIn(ads, ADS1115.P0)
+ads = ADS.ADS1115(i2c)
 
+potentiometer = AnalogIn(ads, ADS.P0)  # potentiometer on A0
+
+# ---------------- Servo Setup (PCA9685) ----------------
+pwm_driver = PWM(0x6F)     # initialize driver
+pwm_driver.setPWMFreq(60)  # servo frequency
+
+servo_channel = 0          # servo channel
+
+# ---------------- Main Loop ----------------
 try:
     print("Servo control using potentiometer started...")
 
-    # main loop to read potentiometer and control servo
     while True:
-        pot_value = pot_channel.value
-        angle = int((pot_value * 180) / 65535)     # map pot value to 0–180 degrees
-        duty = (angle / 18) + 2                    # convert angle to duty cycle
+        pot_value = potentiometer.value  # read analog value
 
-        pwm.ChangeDutyCycle(duty)
+        # map 0–65535 → 0–180 degrees
+        angle = int(np.interp(pot_value, [0, 65535], [0, 180]))
+
+        # map 0–180 → 150–600 (PWM pulse range)
+        pulse = int(np.interp(angle, [0, 180], [150, 600]))
+
+        pwm_driver.setPWM(servo_channel, 0, pulse)  # move servo
 
         print(f"Servo Angle: {angle}°")
+
         time.sleep(0.1)
 
 except KeyboardInterrupt:
-    pwm.stop()
-    GPIO.cleanup()
-    print("Servo stopped.")
+    print("Exiting...")

@@ -1,88 +1,82 @@
 """
 Components Used:
-- Raspberry Pi
-- Pi DC Motor HAT
-- 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Joystick (X-axis and Y-axis)
-- ADS1115 ADC (to read joystick analog values)
-- Jumper Wires
+1. Raspberry Pi
+2. Pi DC Motor HAT
+3. Robot Car (4 DC Motors)
+4. Joystick (X-axis and Y-axis)
+5. ADS1115 ADC
+6. Jumper Wires
 """
 
 import time
-import busio
 import board
-from adafruit_ads1x15.ads1115 import ADS1115
+import busio
+from Raspi_MotorHAT import Raspi_MotorHAT
+import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
-from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
 
-# setup i2c and ads1115 for reading joystick input
+# ---------------- ADS1115 Setup ----------------
 i2c = busio.I2C(board.SCL, board.SDA)
-ads = ADS1115(i2c)
+ads = ADS.ADS1115(i2c)
 
-# assign ads channels for x and y joystick axes
-x_axis_channel = AnalogIn(ads, ADS1115.P0)
-y_axis_channel = AnalogIn(ads, ADS1115.P1)
+x_axis = AnalogIn(ads, ADS.P0)  # X-axis
+y_axis = AnalogIn(ads, ADS.P1)  # Y-axis
 
-# initialize motor hat and setup motors
-mh = Raspi_MotorHAT(addr=0x6f)
-rightFront = mh.getMotor(1)
-rightBack = mh.getMotor(2)
-leftFront = mh.getMotor(3)
-leftBack = mh.getMotor(4)
+# ---------------- Motor Setup ----------------
+motor_hat = Raspi_MotorHAT(addr=0x6f)
 
-# set motor speed
-speed = 150
-rightFront.setSpeed(speed)
-rightBack.setSpeed(speed)
-leftFront.setSpeed(speed)
-leftBack.setSpeed(speed)
+right_front_motor = motor_hat.getMotor(1)
+right_back_motor  = motor_hat.getMotor(2)
+left_front_motor  = motor_hat.getMotor(3)
+left_back_motor   = motor_hat.getMotor(4)
 
-def read_joystick():
-    x_value = x_axis_channel.value
-    y_value = y_axis_channel.value
-    print(f"X: {x_value} | Y: {y_value}")
-    return x_value, y_value
+motor_speed = 150
 
+for motor in (right_front_motor, right_back_motor, left_front_motor, left_back_motor):
+    motor.setSpeed(motor_speed)
+
+# ---------------- Movement Functions ----------------
 def move_forward():
-    print("Moving forward")
-    rightFront.run(Raspi_MotorHAT.FORWARD)
-    rightBack.run(Raspi_MotorHAT.FORWARD)
-    leftFront.run(Raspi_MotorHAT.FORWARD)
-    leftBack.run(Raspi_MotorHAT.FORWARD)
+    right_front_motor.run(Raspi_MotorHAT.FORWARD)
+    right_back_motor.run(Raspi_MotorHAT.FORWARD)
+    left_front_motor.run(Raspi_MotorHAT.FORWARD)
+    left_back_motor.run(Raspi_MotorHAT.FORWARD)
 
 def move_backward():
-    print("Moving backward")
-    rightFront.run(Raspi_MotorHAT.BACKWARD)
-    rightBack.run(Raspi_MotorHAT.BACKWARD)
-    leftFront.run(Raspi_MotorHAT.BACKWARD)
-    leftBack.run(Raspi_MotorHAT.BACKWARD)
+    right_front_motor.run(Raspi_MotorHAT.BACKWARD)
+    right_back_motor.run(Raspi_MotorHAT.BACKWARD)
+    left_front_motor.run(Raspi_MotorHAT.BACKWARD)
+    left_back_motor.run(Raspi_MotorHAT.BACKWARD)
 
 def turn_left():
-    print("Turning left")
-    rightFront.run(Raspi_MotorHAT.BACKWARD)
-    rightBack.run(Raspi_MotorHAT.BACKWARD)
-    leftFront.run(Raspi_MotorHAT.FORWARD)
-    leftBack.run(Raspi_MotorHAT.FORWARD)
+    right_front_motor.run(Raspi_MotorHAT.BACKWARD)
+    right_back_motor.run(Raspi_MotorHAT.BACKWARD)
+    left_front_motor.run(Raspi_MotorHAT.FORWARD)
+    left_back_motor.run(Raspi_MotorHAT.FORWARD)
 
 def turn_right():
-    print("Turning right")
-    rightFront.run(Raspi_MotorHAT.FORWARD)
-    rightBack.run(Raspi_MotorHAT.FORWARD)
-    leftFront.run(Raspi_MotorHAT.BACKWARD)
-    leftBack.run(Raspi_MotorHAT.BACKWARD)
+    right_front_motor.run(Raspi_MotorHAT.FORWARD)
+    right_back_motor.run(Raspi_MotorHAT.FORWARD)
+    left_front_motor.run(Raspi_MotorHAT.BACKWARD)
+    left_back_motor.run(Raspi_MotorHAT.BACKWARD)
 
 def stop_motors():
-    print("Stopping motors")
-    rightFront.run(Raspi_MotorHAT.RELEASE)
-    rightBack.run(Raspi_MotorHAT.RELEASE)
-    leftFront.run(Raspi_MotorHAT.RELEASE)
-    leftBack.run(Raspi_MotorHAT.RELEASE)
+    right_front_motor.run(Raspi_MotorHAT.RELEASE)
+    right_back_motor.run(Raspi_MotorHAT.RELEASE)
+    left_front_motor.run(Raspi_MotorHAT.RELEASE)
+    left_back_motor.run(Raspi_MotorHAT.RELEASE)
 
-# main loop to control robot using joystick
+# ---------------- Main Loop ----------------
 try:
-    while True:
-        x_value, y_value = read_joystick()
+    print("Joystick Control Started...")
 
+    while True:
+        x_value = x_axis.value  # read X-axis
+        y_value = y_axis.value  # read Y-axis
+
+        print(f"X: {x_value} | Y: {y_value}")
+
+        # joystick control logic
         if y_value < 3000:
             move_forward()
         elif y_value > 30000:
@@ -97,5 +91,5 @@ try:
         time.sleep(0.1)
 
 except KeyboardInterrupt:
-    print("Exiting program...")
+    print("Exiting...")
     stop_motors()

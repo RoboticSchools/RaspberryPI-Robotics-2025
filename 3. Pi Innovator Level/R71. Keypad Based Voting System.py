@@ -1,95 +1,97 @@
 """
 Components Used:
-- Raspberry Pi
-- 4x4 Keypad (Matrix Type)
-- I2C LCD Display (PCF8574)
-- Jumper Wires
+1. Raspberry Pi
+2. 4x4 Keypad (Matrix Type)
+3. I2C LCD Display (PCF8574)
+4. Jumper Wires
 """
 
 import time
+import sys
 import RPi.GPIO as GPIO
 from pad4pi import Keypad
 from RPLCD.i2c import CharLCD
-import sys
 
-# Initialize LCD (I2C address 0x27, 16x2 display)
+# ---------------- LCD Setup ----------------
 lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
 
-# Define the keypad layout (4x4 matrix)
-KEYPAD = [
+# ---------------- Keypad Setup ----------------
+keypad_layout = [
     ["1", "2", "3", "A"],
     ["4", "5", "6", "B"],
     ["7", "8", "9", "C"],
     ["*", "0", "#", "D"]
 ]
 
-# Define GPIO pins for keypad rows and columns
-ROW_PINS = [5, 6, 13, 19] 
-COL_PINS = [12, 16, 20, 21] 
+row_pins = [5, 6, 13, 19]   # row pins
+col_pins = [12, 16, 20, 21] # column pins
 
-# Initialize keypad using the pad4pi library
 factory = Keypad.factory()
-keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS)
+keypad = factory.create_keypad(
+    keypad=keypad_layout,
+    row_pins=row_pins,
+    col_pins=col_pins
+)
 
-# Voting counters for each candidate
-vote_counts = {"A": 0, "B": 0, "C": 0, "D": 0}
+# ---------------- Voting Data ----------------
+vote_counts = {"A": 0, "B": 0, "C": 0, "D": 0}  # store votes
 
-# Display initial message on LCD
-lcd.clear()
-lcd.write_string("Get Ready\nTo Vote!")
-time.sleep(3)
-lcd.clear()
-
-# Function to display voting options
-def intro_vote():
+# ---------------- Display Functions ----------------
+def show_intro():
     lcd.clear()
-    lcd.write_string("Vote A    Vote B\nVote C    Vote D")
-
-intro_vote()
-
-# Function to handle key press events
-def key_pressed(key):
+    lcd.write_string("Get Ready\nTo Vote!")
+    time.sleep(3)
     lcd.clear()
-    
+
+def show_options():
+    lcd.clear()
+    lcd.write_string("Vote A  Vote B\nVote C  Vote D")
+
+# ---------------- Key Press Handler ----------------
+def on_key_pressed(key):
+    lcd.clear()
+
     if key in vote_counts:
-        # Increment the vote count for the pressed key
-        vote_counts[key] += 1
+        vote_counts[key] += 1          # increase vote count
         lcd.write_string(f"Voted {key}")
 
-    elif key == "#":  # Display results when "#" is pressed
+    elif key == "#":                  # show results
         lcd.write_string(f"A:{vote_counts['A']} B:{vote_counts['B']}\n")
         lcd.write_string(f"C:{vote_counts['C']} D:{vote_counts['D']}")
         time.sleep(3)
 
-        # Determine the highest vote count
-        max_vote = max(vote_counts.values())
+        # find highest votes
+        max_votes = max(vote_counts.values())
 
-        # Find the candidates who received the maximum votes
-        winners = [candidate for candidate, votes in vote_counts.items() if votes == max_vote]
+        # get winner(s)
+        winners = [k for k, v in vote_counts.items() if v == max_votes]
 
         lcd.clear()
         lcd.write_string("Winner(s):\n" + " ".join(winners))
         time.sleep(5)
 
-        GPIO.cleanup()
+        GPIO.cleanup()                # cleanup GPIO
         lcd.clear()
         lcd.write_string("Voting Done")
         time.sleep(2)
-        sys.exit()
+        sys.exit()                    # exit program
 
-    time.sleep(3)
-    intro_vote()
+    time.sleep(2)
+    show_options()                    # show menu again
 
-# Register keypad event handler
-keypad.registerKeyPressHandler(key_pressed)
+keypad.registerKeyPressHandler(on_key_pressed)
 
+# ---------------- Main Loop ----------------
 try:
+    show_intro()      # display welcome
+    show_options()    # display options
+
     while True:
-        time.sleep(0.1)  # Prevent excessive CPU usage
+        time.sleep(0.1)  # keep program running
 
 except KeyboardInterrupt:
-    print("\nExiting...")
-    GPIO.cleanup()  # Cleanup GPIO on exit
+    print("Exiting...")
+    GPIO.cleanup()      # reset GPIO
     lcd.clear()
     lcd.write_string("System Stopped")
     time.sleep(2)

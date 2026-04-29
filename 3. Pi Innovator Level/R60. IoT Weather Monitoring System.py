@@ -1,8 +1,8 @@
 """
 Components Used:
 1. Raspberry Pi
-2. DHT11 Temperature and Humidity Sensor
-3. Blynk App (Virtual Pins V1 and V2)
+2. DHT11 Sensor (Temperature & Humidity)
+3. Blynk Web App
 4. Jumper Wires
 """
 

@@ -1,8 +1,8 @@
 """
 Components Used:
-- Raspberry Pi
-- OLED Display (128x64) using SSD1306 (I2C)
-- Jumper Wires
+1. Raspberry Pi
+2. OLED Display (128x64, SSD1306 I2C)
+3. Jumper Wires
 """
 
 import time
@@ -12,54 +12,46 @@ import psutil
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
-# Initialize I2C interface
-i2c = busio.I2C(board.SCL, board.SDA)
+# I2C setup
+i2c = busio.I2C(board.SCL, board.SDA)  # init I2C
 
-# Create SSD1306 display object
-oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
+# OLED setup
+oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)  # init display
 
-# Clear the display
-oled.fill(0)
+oled.fill(0)  # clear display
 oled.show()
 
-# Create an image buffer
-width = oled.width
-height = oled.height
-image = Image.new("1", (width, height))
-draw = ImageDraw.Draw(image)
+# create image buffer
+width, height = oled.width, oled.height
+image = Image.new("1", (width, height))  # blank image
+draw = ImageDraw.Draw(image)  # draw object
+font = ImageFont.load_default()  # load font
 
-# Load a font
-font = ImageFont.load_default()
-
-# Function to get system stats
+# get system stats
 def get_system_stats():
-    cpu = psutil.cpu_percent(interval=1)  # Get CPU usage percentage
-    memory = psutil.virtual_memory().percent  # Get memory usage percentage
+    cpu = psutil.cpu_percent(interval=1)  # CPU usage
+    memory = psutil.virtual_memory().percent  # RAM usage
     return cpu, memory
 
-# Function to display system stats on OLED
+# display stats
 def display_stats():
-    cpu, memory = get_system_stats()
+    cpu, memory = get_system_stats()  # read stats
 
-    draw.rectangle((0, 0, width, height), outline=0, fill=0)  # Clear display
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)  # clear screen
 
-    # Display CPU usage
-    draw.text((0, 0), f"CPU: {cpu}%", font=font, fill=255)
+    draw.text((0, 0), f"CPU: {cpu}%", font=font, fill=255)  # show CPU
+    draw.text((0, 20), f"RAM: {memory}%", font=font, fill=255)  # show RAM
 
-    # Display memory usage
-    draw.text((0, 20), f"RAM: {memory}%", font=font, fill=255)
+    oled.image(image)  # send image
+    oled.show()        # update display
 
-    # Update the display
-    oled.image(image)
-    oled.show()
-
-# Continuously update stats on OLED
+# main loop
 try:
     while True:
-        display_stats()
-        time.sleep(2)  # Update every 2 seconds
+        display_stats()  # update stats
+        time.sleep(2)    # delay
 
 except KeyboardInterrupt:
-    oled.fill(0)
+    oled.fill(0)  # clear display
     oled.show()
-    print("Exiting program.")
+    print("Exiting...")
