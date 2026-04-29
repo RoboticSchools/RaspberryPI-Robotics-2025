@@ -1,44 +1,41 @@
 """
 Components Used:
-- Raspberry Pi
-- Raspi Motor HAT
-- 2 IR Sensors (Left and Right)
-- 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Breadboard
-- Jumper Wires
+1. Raspberry Pi
+2. DC Motor HAT
+3. 2 IR Sensors (Left and Right)
+4. Robot Car (4 DC Motors)
+5. Breadboard
+6. Jumper Wires
 """
 
 import RPi.GPIO as GPIO
-import time
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
-# Setup GPIO mode and pins
+# ---------------- GPIO Setup ----------------
 GPIO.setmode(GPIO.BCM)
 
-# IR sensor pins
-left_sensor_pin = 17  # IR sensor connected to GPIO 17
-right_sensor_pin = 27  # IR sensor connected to GPIO 27
+left_sensor_pin = 21   # left IR sensor
+right_sensor_pin = 20  # right IR sensor
 
-# Initialize Motor HAT (Default I2C address 0x6F)
+# ---------------- Motor Setup ----------------
 mh = Raspi_MotorHAT(addr=0x6f)
 
-# Create motor objects for the four wheels
 right_front_motor = mh.getMotor(1)
-right_back_motor = mh.getMotor(2)
-left_front_motor = mh.getMotor(3)
-left_back_motor = mh.getMotor(4)
+right_back_motor  = mh.getMotor(2)
+left_front_motor  = mh.getMotor(3)
+left_back_motor   = mh.getMotor(4)
 
-# Set motors speed
-speed = 150
-right_front_motor.setSpeed(speed)
-right_back_motor.setSpeed(speed)
-left_front_motor.setSpeed(speed)
-left_back_motor.setSpeed(speed)
+speed = 150  # motor speed
 
-# Set up the IR sensor pins
+for motor in (right_front_motor, right_back_motor, left_front_motor, left_back_motor):
+    motor.setSpeed(speed)
+
+# ---------------- Sensor Setup ----------------
 GPIO.setup(left_sensor_pin, GPIO.IN)
 GPIO.setup(right_sensor_pin, GPIO.IN)
 
+# ---------------- Movement Functions ----------------
 def move_forward():
     print("Moving Forward")
     right_front_motor.run(Raspi_MotorHAT.FORWARD)
@@ -74,28 +71,27 @@ def stop_motors():
     left_front_motor.run(Raspi_MotorHAT.RELEASE)
     left_back_motor.run(Raspi_MotorHAT.RELEASE)
 
+# ---------------- Main Loop ----------------
 try:
     while True:
-        # Read the sensor values
-        left_sensor = GPIO.input(left_sensor_pin)
-        right_sensor = GPIO.input(right_sensor_pin)
+        left_sensor = GPIO.input(left_sensor_pin)    # read left sensor
+        right_sensor = GPIO.input(right_sensor_pin)  # read right sensor
 
         if left_sensor == GPIO.HIGH and right_sensor == GPIO.LOW:
-            # Turn right if the left sensor is off the line (detected HIGH, off the line)
-            turn_right()
-        elif left_sensor == GPIO.LOW and right_sensor == GPIO.HIGH:
-            # Turn left if the right sensor is off the line (detected HIGH, off the line)
-            turn_left()
-        elif left_sensor == GPIO.LOW and right_sensor == GPIO.LOW:
-            # Move forward if both sensors are on the line (detected LOW, on the line)
-            move_forward()
-        else:
-            # Stop the motors if both sensors are off the line (both HIGH)
-            stop_motors()
+            turn_right()      # left off line → turn right
 
-        time.sleep(0.1)  # Small delay for smooth operation
+        elif left_sensor == GPIO.LOW and right_sensor == GPIO.HIGH:
+            turn_left()       # right off line → turn left
+
+        elif left_sensor == GPIO.LOW and right_sensor == GPIO.LOW:
+            move_forward()    # both on line → forward
+
+        else:
+            stop_motors()     # both off line → stop
+
+        time.sleep(0.1)
 
 except KeyboardInterrupt:
     print("Exiting...")
     stop_motors()
-    GPIO.cleanup()  # Clean up GPIO settings
+    GPIO.cleanup()

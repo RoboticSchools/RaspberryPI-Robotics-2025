@@ -1,10 +1,10 @@
 """
 Components Used:
-- Raspberry Pi
-- Pi DC Motor Hat
-- IR Sensor
-- Water Pump
-- Jumper Wires
+1. Raspberry Pi
+2. DC Motor Hat
+3. IR Sensor
+4. Water Pump
+5. Jumper Wires
 """
 
 import RPi.GPIO as GPIO
@@ -22,7 +22,7 @@ water_pump.setSpeed(150)
 
 # Setup GPIO mode and pins
 GPIO.setmode(GPIO.BCM)
-ir_sensor_pin = 17
+ir_sensor_pin = 21
 # Set up the IR sensor pin
 GPIO.setup(ir_sensor_pin, GPIO.IN)
 

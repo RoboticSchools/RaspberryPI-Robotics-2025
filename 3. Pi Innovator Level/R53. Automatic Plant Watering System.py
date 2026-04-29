@@ -1,20 +1,20 @@
 """
 Components Used:
-- Raspberry Pi
-- Pi DC Motor HAT
-- Soil Moisture Sensor
-- Water Pump
-- ADS1115 ADC
-- Breadboard
-- Jumper Wires
+1. Raspberry Pi
+2. DC Motor HAT
+3. Soil Moisture Sensor
+4. Water Pump
+5. ADS1115 Module
+6. Breadboard
+7. Jumper Wires
 """
 
-import board
-import time
-import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 from Raspi_MotorHAT import Raspi_MotorHAT
+import board
+import time
+import busio
 
 # Initialize the I2C interface for ADS1115
 i2c = busio.I2C(board.SCL, board.SDA)

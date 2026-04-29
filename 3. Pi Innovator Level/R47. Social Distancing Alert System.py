@@ -1,23 +1,23 @@
 """
 Components Used:
-- Raspberry Pi
-- Ultrasonic Sensor
-- Red LED
-- Green LED
-- Buzzer
-- Breadboard
-- Jumper Wires
+1. Raspberry Pi
+2. Ultrasonic Sensor
+3. Red LED
+4. Green LED
+5. Buzzer
+6. Breadboard
+7. Jumper Wires
 """
 
-import time
 import RPi.GPIO as gpio
+import time
 
 # GPIO Pin configuration
-trig = 23      # Trigger pin of HC-SR04
-echo = 24      # Echo pin of HC-SR04
-red_led = 12   # Red LED pin
-green_led = 16 # Green LED pin
-buzzer = 21    # Buzzer pin
+trig = 21      # Trigger pin of HC-SR04
+echo = 20      # Echo pin of HC-SR04
+red_led = 16   # Red LED pin
+green_led = 12 # Green LED pin
+buzzer = 26    # Buzzer pin
 
 # GPIO setup
 gpio.setmode(gpio.BCM)
