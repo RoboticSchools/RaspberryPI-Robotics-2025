@@ -1,3 +1,12 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. RGB LED (Common Cathode)
+3. Push Button
+4. Breadboard
+5. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 import random

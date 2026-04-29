@@ -1,3 +1,14 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. LED
+3. Breadboard
+4. Jumper Wires
+
+Install Required Library:
+pip install bluedot --break-system-packages
+"""
+
 import RPi.GPIO as gpio
 from bluedot import BlueDot
 from signal import pause

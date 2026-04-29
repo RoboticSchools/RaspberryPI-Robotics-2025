@@ -1,10 +1,18 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. LED
+3. Breadboard
+4. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 
-led_pin = 21  # GPIO pin connected to LED
+led_pin = 21  # GPIO pin for LED
 
-gpio.setmode(gpio.BCM)         # Use BCM pin numbering
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+gpio.setmode(gpio.BCM)        # Use BCM pin numbering
+gpio.setup(led_pin, gpio.OUT) # Set LED as output
 
 try:
     blinks = int(input("Enter number of blinks: "))  # Get user input

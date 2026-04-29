@@ -1,7 +1,16 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. Buzzer
+3. 4 Push Buttons
+4. Breadboard
+5. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 
-buzzer_pin = 21              # GPIO pin for buzzer
+buzzer_pin = 21                 # GPIO pin for buzzer
 button_pins = [26, 19, 13, 6]  # GPIO pins for buttons
 
 notes = [262, 294, 330, 349]  # Note frequencies

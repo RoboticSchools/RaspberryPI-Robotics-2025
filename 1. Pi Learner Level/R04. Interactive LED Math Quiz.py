@@ -1,13 +1,22 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. Green LED
+3. Red LED
+4. Breadboard
+5. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 import random
 
-green_led = 21  # GPIO pin for correct answer LED
-red_led = 16    # GPIO pin for wrong answer LED
+green_led = 21  # GPIO pin for correct LED
+red_led = 16    # GPIO pin for wrong LED
 
-gpio.setmode(gpio.BCM)            # Use BCM pin numbering
-gpio.setup(green_led, gpio.OUT)   # Set green LED as output
-gpio.setup(red_led, gpio.OUT)     # Set red LED as output
+gpio.setmode(gpio.BCM)           # Use BCM pin numbering
+gpio.setup(green_led, gpio.OUT)  # Set green LED as output
+gpio.setup(red_led, gpio.OUT)    # Set red LED as output
 
 def generate_question():
     num1 = random.randint(1, 10)  # Random number 1
@@ -26,7 +35,7 @@ try:
         else:
             gpio.output(green_led, gpio.LOW)   # Turn green LED OFF
             gpio.output(red_led, gpio.HIGH)    # Turn red LED ON
-            print(f"Wrong! Red LED is ON. Answer is {correct_answer}.")
+            print(f"Wrong! Answer is {correct_answer}.")
 
         time.sleep(2)  # Wait before next question
 

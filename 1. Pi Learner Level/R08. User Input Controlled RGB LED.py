@@ -1,3 +1,11 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. RGB LED (Common Cathode)
+3. Breadboard
+4. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 
@@ -12,7 +20,7 @@ gpio.setup(blue_pin, gpio.OUT)   # Set blue pin as output
 
 try:
     while True:
-        user_input = input("Enter color (r, g, b, y, m, c, w): ").lower()  # Get user input
+        user_input = input("Enter color (r, g, b, y, m, c, w): ").lower()  # Get input
 
         if user_input == "r":
             gpio.output(red_pin, gpio.HIGH)    # Red ON
@@ -33,31 +41,31 @@ try:
             print("Blue LED is ON")
 
         elif user_input == "y":
-            gpio.output(red_pin, gpio.HIGH)    # Red + Green = Yellow
+            gpio.output(red_pin, gpio.HIGH)    # Yellow
             gpio.output(green_pin, gpio.HIGH)
             gpio.output(blue_pin, gpio.LOW)
             print("Yellow LED is ON")
 
         elif user_input == "m":
-            gpio.output(red_pin, gpio.HIGH)    # Red + Blue = Magenta
+            gpio.output(red_pin, gpio.HIGH)    # Magenta
             gpio.output(green_pin, gpio.LOW)
             gpio.output(blue_pin, gpio.HIGH)
             print("Magenta LED is ON")
 
         elif user_input == "c":
             gpio.output(red_pin, gpio.LOW)
-            gpio.output(green_pin, gpio.HIGH)  # Green + Blue = Cyan
+            gpio.output(green_pin, gpio.HIGH)  # Cyan
             gpio.output(blue_pin, gpio.HIGH)
             print("Cyan LED is ON")
 
         elif user_input == "w":
-            gpio.output(red_pin, gpio.HIGH)    # Red + Green + Blue = White
+            gpio.output(red_pin, gpio.HIGH)    # White
             gpio.output(green_pin, gpio.HIGH)
             gpio.output(blue_pin, gpio.HIGH)
             print("White LED is ON")
 
         else:
-            print("Invalid input! Enter r, g, b, y, m, c, or w.")
+            print("Invalid input")
 
 except KeyboardInterrupt:
     gpio.cleanup()  # Reset GPIO on exit

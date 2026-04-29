@@ -1,109 +1,118 @@
 """
 Components Used:
-- Raspberry Pi
-- Raspi Motor HAT
-- 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
-- Blynk App (for controlling the robot via IoT)
+1. Raspberry Pi
+2. DC Motor HAT
+3. Robot Car (4 DC Motors)
+4. Blynk App (IoT Control)
+
+Install Required Library:
+pip install blynklib --break-system-packages
 """
 
 import time
 from BlynkLib import Blynk
 from Raspi_MotorHAT import Raspi_MotorHAT
 
-# Replace with your Blynk authentication token
-BLYNK_AUTH = 'YOUR_BLYNK_AUTH_TOKEN'
+BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"  # Enter your Blynk token
 
-# Initialize Motor HAT (Default I2C address 0x6F)
-mh = Raspi_MotorHAT(addr=0x6f)
+mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 
-# Create motor objects for the four wheels
+# Motor connections
 rightFront = mh.getMotor(1)
 rightBack = mh.getMotor(2)
 leftFront = mh.getMotor(3)
 leftBack = mh.getMotor(4)
 
-# Set motors speed
-speed = 150
+speed = 150  # Speed (0–255)
+
+# Set speed for all motors
 rightFront.setSpeed(speed)
 rightBack.setSpeed(speed)
 leftFront.setSpeed(speed)
 leftBack.setSpeed(speed)
 
-# Initialize Blynk
-blynk = Blynk(BLYNK_AUTH)
+blynk = Blynk(BLYNK_AUTH)  # Connect to Blynk
 
-# Function to move forward
+# Movement functions
 def move_forward():
-    print("Moving forward")
     rightFront.run(Raspi_MotorHAT.FORWARD)
     rightBack.run(Raspi_MotorHAT.FORWARD)
     leftFront.run(Raspi_MotorHAT.FORWARD)
     leftBack.run(Raspi_MotorHAT.FORWARD)
+    print("Forward")
 
-# Function to move backward
 def move_backward():
-    print("Moving backward")
     rightFront.run(Raspi_MotorHAT.BACKWARD)
     rightBack.run(Raspi_MotorHAT.BACKWARD)
     leftFront.run(Raspi_MotorHAT.BACKWARD)
     leftBack.run(Raspi_MotorHAT.BACKWARD)
+    print("Backward")
 
-# Function to turn left
 def turn_left():
-    print("Turning left")
     rightFront.run(Raspi_MotorHAT.BACKWARD)
     rightBack.run(Raspi_MotorHAT.BACKWARD)
     leftFront.run(Raspi_MotorHAT.FORWARD)
     leftBack.run(Raspi_MotorHAT.FORWARD)
+    print("Left")
 
-# Function to turn right
 def turn_right():
-    print("Turning right")
     rightFront.run(Raspi_MotorHAT.FORWARD)
     rightBack.run(Raspi_MotorHAT.FORWARD)
     leftFront.run(Raspi_MotorHAT.BACKWARD)
     leftBack.run(Raspi_MotorHAT.BACKWARD)
+    print("Right")
 
-# Function to stop motors
 def stop_motors():
-    print("Stopping motors")
     rightFront.run(Raspi_MotorHAT.RELEASE)
     rightBack.run(Raspi_MotorHAT.RELEASE)
     leftFront.run(Raspi_MotorHAT.RELEASE)
     leftBack.run(Raspi_MotorHAT.RELEASE)
+    print("Stop")
 
-# Blynk Virtual Pin handlers
-@blynk.on("V1")  # Forward Button
-def move_forward_blynk(value):
-    if value[0] == '1':  # Button pressed
+# Forward button (V1)
+@blynk.on("V1")
+def forward_handler(value):
+    if int(value[0]) == 1:  # Press
         move_forward()
-
-@blynk.on("V2")  # Backward Button
-def move_backward_blynk(value):
-    if value[0] == '1':  # Button pressed
-        move_backward()
-
-@blynk.on("V3")  # Left Button
-def move_left_blynk(value):
-    if value[0] == '1':  # Button pressed
-        turn_left()
-
-@blynk.on("V4")  # Right Button
-def move_right_blynk(value):
-    if value[0] == '1':  # Button pressed
-        turn_right()
-
-@blynk.on("V5")  # Stop Button
-def stop_blynk(value):
-    if value[0] == '1':  # Button pressed
+    else:                   # Release
         stop_motors()
 
-# Run Blynk
+# Backward button (V2)
+@blynk.on("V2")
+def backward_handler(value):
+    if int(value[0]) == 1:
+        move_backward()
+    else:
+        stop_motors()
+
+# Left button (V3)
+@blynk.on("V3")
+def left_handler(value):
+    if int(value[0]) == 1:
+        turn_left()
+    else:
+        stop_motors()
+
+# Right button (V4)
+@blynk.on("V4")
+def right_handler(value):
+    if int(value[0]) == 1:
+        turn_right()
+    else:
+        stop_motors()
+
+# Stop button (V5)
+@blynk.on("V5")
+def stop_handler(value):
+    if int(value[0]) == 1:
+        stop_motors()
+
 try:
+    print("Waiting for Blynk control...")
     while True:
-        blynk.run()
-        time.sleep(0.1)
+        blynk.run()        # Handle Blynk events
+        time.sleep(0.05)   # Small delay
 
 except KeyboardInterrupt:
     print("Exiting...")
-    stop_motors()
+    stop_motors()  # Stop all motors safely

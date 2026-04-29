@@ -1,13 +1,24 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. LED
+3. Breadboard
+4. Jumper Wires
+
+Install Required Library:
+pip install blynklib --break-system-packages
+"""
+
 import RPi.GPIO as gpio
 from BlynkLib import Blynk
 import time
 
-BLYNK_AUTH = "35MM8LiiGN_EPE96RJsB-wK3E5tlwbxK"  # Blynk auth token
+BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"  # Enter your Blynk auth token
 
 led_pin = 21  # GPIO pin for LED
 
-gpio.setmode(gpio.BCM)       # Use BCM pin numbering
-gpio.setup(led_pin, gpio.OUT)  # Set LED as output
+gpio.setmode(gpio.BCM)        # Use BCM pin numbering
+gpio.setup(led_pin, gpio.OUT) # Set LED as output
 
 blynk = Blynk(BLYNK_AUTH)  # Initialize Blynk
 

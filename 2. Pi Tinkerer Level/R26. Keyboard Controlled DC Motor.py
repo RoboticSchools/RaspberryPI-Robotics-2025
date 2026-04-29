@@ -1,26 +1,28 @@
 """
 Components Used:
-- Raspberry Pi
-- Pi DC Motor HAT
-- DC Motor
-- Keyboard (Arrow Keys for Control)
+1. Raspberry Pi
+2. DC Motor HAT
+3. DC Motor
+4. Keyboard (Arrow Keys)
+
+Install Required Library:
+pip install pynput --break-system-packages
 """
 
 import time
 from pynput import keyboard
-from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
+from Raspi_MotorHAT import Raspi_MotorHAT
 
-# Initialize Motor HAT (Default I2C address 0x6F)
-mh = Raspi_MotorHAT(addr=0x6f)
+mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 
-# Select Motor 3
-motor = mh.getMotor(3)
-motor.setSpeed(150)  # Set speed
+motor = mh.getMotor(3)  # Select motor
+motor.setSpeed(150)     # Set motor speed
 
 def on_press(key):
     if key == keyboard.Key.up:
         print("Motor Forward")
         motor.run(Raspi_MotorHAT.FORWARD)
+
     elif key == keyboard.Key.down:
         print("Motor Backward")
         motor.run(Raspi_MotorHAT.BACKWARD)
@@ -28,13 +30,14 @@ def on_press(key):
 def on_release(key):
     print("Motor Stopped")
     motor.run(Raspi_MotorHAT.RELEASE)
-    if key == keyboard.Key.esc:
-        return False  # Stop listener
 
-# Listen for keyboard inputs
+    if key == keyboard.Key.esc:
+        return False  # Exit program
+
 try:
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-        listener.join()
+        listener.join()  # Start listening
+
 except KeyboardInterrupt:
     print("Exiting...")
-    motor.run(Raspi_MotorHAT.RELEASE)
+    motor.run(Raspi_MotorHAT.RELEASE)  # Stop motor

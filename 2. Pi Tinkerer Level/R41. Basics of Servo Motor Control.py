@@ -1,37 +1,33 @@
 """
 Components Used:
-- Raspberry Pi
-- Servo Motor (SG90)
-- Jumper Wires
+1. Raspberry Pi
+2. Servo Motor (SG90)
+3. Jumper Wires
 """
 
 import time
 import RPi.GPIO as gpio
 
-# Servo Pin Configuration
-servo_pin = 18  # GPIO18 connected to Servo PWM
+servo_pin = 18  # GPIO pin for servo
 
-# GPIO Setup
-gpio.setmode(gpio.BCM)
-gpio.setup(servo_pin, gpio.OUT)
+gpio.setmode(gpio.BCM)        # Use BCM numbering
+gpio.setup(servo_pin, gpio.OUT)  # Set servo pin as output
 
-# Initialize PWM for Servo (50Hz frequency)
-servo = gpio.PWM(servo_pin, 50)
-servo.start(0)
+servo = gpio.PWM(servo_pin, 50)  # 50Hz PWM for servo
+servo.start(0)  # Start PWM
 
 def set_angle(angle):
-    """Convert angle (0-180) to PWM duty cycle and rotate servo"""
     duty_cycle = 2 + (angle / 18)  # Convert angle to duty cycle
-    servo.ChangeDutyCycle(duty_cycle)
-    time.sleep(1)  # Wait for servo to reach position
-    servo.ChangeDutyCycle(2)  # Set to minimum to avoid jitter
+    servo.ChangeDutyCycle(duty_cycle)  # Move servo
+    time.sleep(1)  # Wait to reach position
+    servo.ChangeDutyCycle(0)  # Stop signal (reduce jitter)
 
 try:
     while True:
-        set_angle(0)    # Rotate to 0°
-        set_angle(90)   # Rotate to 90°
-        set_angle(180)  # Rotate to 180°
+        set_angle(0)    # Move to 0°
+        set_angle(90)   # Move to 90°
+        set_angle(180)  # Move to 180°
 
 except KeyboardInterrupt:
-    servo.stop()
-    gpio.cleanup()  # Reset GPIO settings before exit
+    servo.stop()     # Stop PWM
+    gpio.cleanup()   # Reset GPIO

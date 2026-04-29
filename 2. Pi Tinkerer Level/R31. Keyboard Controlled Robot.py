@@ -1,38 +1,39 @@
 """
 Components Used:
-- Raspberry Pi
-- Pi DC Motor HAT
-- Robot Car Setup
-- 4 DC Motors (Right Front, Right Back, Left Front, Left Back)
+1. Raspberry Pi
+2. DC Motor HAT
+3. Robot Car
+4. 4 DC Motors
+5. Keyboard
+
+Install Required Library:
+pip install pynput --break-system-packages
 """
 
-from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
+from pynput import keyboard
+from Raspi_MotorHAT import Raspi_MotorHAT
 import time
 
-# Initialize Motor HAT (Default I2C address 0x6F)
-mh = Raspi_MotorHAT(addr=0x6f)
+mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 
-# Create motor objects for the four wheels
-rightFront = mh.getMotor(1)
-rightBack = mh.getMotor(2)
-leftFront = mh.getMotor(3)
-leftBack = mh.getMotor(4)
+rightFront = mh.getMotor(1)  # Motor 1
+rightBack = mh.getMotor(2)   # Motor 2
+leftFront = mh.getMotor(3)   # Motor 3
+leftBack = mh.getMotor(4)    # Motor 4
 
-# Set motors speed
-speed = 150
+speed = 150  # Motor speed
+
 rightFront.setSpeed(speed)
 rightBack.setSpeed(speed)
 leftFront.setSpeed(speed)
 leftBack.setSpeed(speed)
 
-# Define the movement functions
 def move_forward():
     print("Moving forward")
     rightFront.run(Raspi_MotorHAT.FORWARD)
     rightBack.run(Raspi_MotorHAT.FORWARD)
     leftFront.run(Raspi_MotorHAT.FORWARD)
     leftBack.run(Raspi_MotorHAT.FORWARD)
-    time.sleep(2)
 
 def move_backward():
     print("Moving backward")
@@ -40,7 +41,6 @@ def move_backward():
     rightBack.run(Raspi_MotorHAT.BACKWARD)
     leftFront.run(Raspi_MotorHAT.BACKWARD)
     leftBack.run(Raspi_MotorHAT.BACKWARD)
-    time.sleep(2)
 
 def turn_left():
     print("Turning left")
@@ -48,7 +48,6 @@ def turn_left():
     rightBack.run(Raspi_MotorHAT.BACKWARD)
     leftFront.run(Raspi_MotorHAT.FORWARD)
     leftBack.run(Raspi_MotorHAT.FORWARD)
-    time.sleep(2)
 
 def turn_right():
     print("Turning right")
@@ -56,7 +55,6 @@ def turn_right():
     rightBack.run(Raspi_MotorHAT.FORWARD)
     leftFront.run(Raspi_MotorHAT.BACKWARD)
     leftBack.run(Raspi_MotorHAT.BACKWARD)
-    time.sleep(2)
 
 def stop_motors():
     print("Stopping motors")
@@ -64,18 +62,27 @@ def stop_motors():
     rightBack.run(Raspi_MotorHAT.RELEASE)
     leftFront.run(Raspi_MotorHAT.RELEASE)
     leftBack.run(Raspi_MotorHAT.RELEASE)
-    time.sleep(2)
 
-# Run the movements in a loop
+def on_press(key):
+    if key == keyboard.Key.up:
+        move_forward()
+    elif key == keyboard.Key.down:
+        move_backward()
+    elif key == keyboard.Key.left:
+        turn_left()
+    elif key == keyboard.Key.right:
+        turn_right()
+
+def on_release(key):
+    stop_motors()  # Stop on key release
+
+    if key == keyboard.Key.esc:
+        return False  # Exit program
+
 try:
-    while True:
-        move_forward()    
-        move_backward()   
-        stop_motors()    
-        turn_left()      
-        turn_right()   
-        stop_motors()  
+    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+        listener.join()  # Start listening
 
 except KeyboardInterrupt:
-    print("Exiting program...")
-    stop_motors()  # Ensure motors stop when the program is interrupted
+    print("Exiting...")
+    stop_motors()  # Stop all motors

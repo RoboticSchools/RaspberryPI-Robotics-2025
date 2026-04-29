@@ -1,3 +1,13 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. Green LED
+3. Yellow LED
+4. Red LED
+5. Breadboard
+6. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 

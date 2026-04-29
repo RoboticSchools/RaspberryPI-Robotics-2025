@@ -1,3 +1,11 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. RGB LED (Common Cathode)
+3. Breadboard
+4. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 
@@ -16,7 +24,7 @@ try:
         gpio.output(green_pin, gpio.LOW)
         gpio.output(blue_pin, gpio.LOW)
         print("Red")
-        time.sleep(1)  # Wait 1 second
+        time.sleep(1)
 
         gpio.output(red_pin, gpio.LOW)
         gpio.output(green_pin, gpio.HIGH)  # Green ON
@@ -30,25 +38,25 @@ try:
         print("Blue")
         time.sleep(1)
 
-        gpio.output(red_pin, gpio.HIGH)    # Red + Green = Yellow
+        gpio.output(red_pin, gpio.HIGH)    # Yellow
         gpio.output(green_pin, gpio.HIGH)
         gpio.output(blue_pin, gpio.LOW)
         print("Yellow")
         time.sleep(1)
 
-        gpio.output(red_pin, gpio.HIGH)    # Red + Blue = Magenta
+        gpio.output(red_pin, gpio.HIGH)    # Magenta
         gpio.output(green_pin, gpio.LOW)
         gpio.output(blue_pin, gpio.HIGH)
         print("Magenta")
         time.sleep(1)
 
         gpio.output(red_pin, gpio.LOW)
-        gpio.output(green_pin, gpio.HIGH)  # Green + Blue = Cyan
+        gpio.output(green_pin, gpio.HIGH)  # Cyan
         gpio.output(blue_pin, gpio.HIGH)
         print("Cyan")
         time.sleep(1)
 
-        gpio.output(red_pin, gpio.HIGH)    # Red + Green + Blue = White
+        gpio.output(red_pin, gpio.HIGH)    # White
         gpio.output(green_pin, gpio.HIGH)
         gpio.output(blue_pin, gpio.HIGH)
         print("White")

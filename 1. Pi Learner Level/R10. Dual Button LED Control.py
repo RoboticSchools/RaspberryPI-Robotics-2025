@@ -1,3 +1,12 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. LED
+3. Two Push Buttons
+4. Breadboard
+5. Jumper Wires
+"""
+
 import RPi.GPIO as gpio
 import time
 
@@ -6,7 +15,7 @@ button_on = 16    # GPIO pin for ON button
 button_off = 12   # GPIO pin for OFF button
 
 gpio.setmode(gpio.BCM)  # Use BCM pin numbering
-gpio.setup(led_pin, gpio.OUT)  # Set LED pin as output
+gpio.setup(led_pin, gpio.OUT)  # Set LED as output
 gpio.setup(button_on, gpio.IN, pull_up_down=gpio.PUD_UP)   # Set ON button as input
 gpio.setup(button_off, gpio.IN, pull_up_down=gpio.PUD_UP)  # Set OFF button as input
 

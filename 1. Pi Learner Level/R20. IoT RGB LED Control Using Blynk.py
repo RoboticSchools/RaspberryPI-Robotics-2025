@@ -1,8 +1,19 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. RGB LED
+3. Breadboard
+4. Jumper Wires
+
+Install Required Library:
+pip install blynklib --break-system-packages
+"""
+
 import RPi.GPIO as gpio
 from BlynkLib import Blynk
 import time
 
-BLYNK_AUTH = "35MM8LiiGN_EPE96RJsB-wK3E5tlwbxK"  # Blynk auth token
+BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"  # Enter your Blynk auth token
 
 red_pin = 21    # GPIO pin for red LED
 green_pin = 20  # GPIO pin for green LED

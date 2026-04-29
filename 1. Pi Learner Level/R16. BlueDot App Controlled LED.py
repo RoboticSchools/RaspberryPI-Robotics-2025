@@ -1,11 +1,22 @@
+"""
+Components Used:
+1. Raspberry Pi
+2. LED
+3. Breadboard
+4. Jumper Wires
+
+Install Required Library:
+pip install bluedot --break-system-packages
+"""
+
 import RPi.GPIO as gpio
 from bluedot import BlueDot
 from signal import pause
 
 led_pin = 21  # GPIO pin for LED
 
-gpio.setmode(gpio.BCM)       # Use BCM pin numbering
-gpio.setup(led_pin, gpio.OUT)  # Set LED as output
+gpio.setmode(gpio.BCM)        # Use BCM pin numbering
+gpio.setup(led_pin, gpio.OUT) # Set LED as output
 
 bd = BlueDot()  # Create BlueDot object
 
