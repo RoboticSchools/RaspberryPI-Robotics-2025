@@ -19,11 +19,10 @@ try:
 
     for i in range(blinks):
         gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
-        print(f"Blink {i+1}: LED is ON")
+        print(f"Blink {i+1}")
         time.sleep(1)  # Wait 1 second
 
         gpio.output(led_pin, gpio.LOW)   # Turn LED OFF
-        print(f"Blink {i+1}: LED is OFF")
         time.sleep(1)  # Wait 1 second
 
 except KeyboardInterrupt:
