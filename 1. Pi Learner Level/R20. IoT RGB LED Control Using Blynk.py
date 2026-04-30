@@ -7,7 +7,7 @@ Components Used:
 5. Blynk WebApp
 
 Install Required Library:
-pip install blynklib --break-system-packages
+pip install blynk-library-python --break-system-packages
 """
 
 import RPi.GPIO as gpio
@@ -25,7 +25,8 @@ gpio.setup(red_pin, gpio.OUT)    # Set red pin as output
 gpio.setup(green_pin, gpio.OUT)  # Set green pin as output
 gpio.setup(blue_pin, gpio.OUT)   # Set blue pin as output
 
-blynk = Blynk(BLYNK_AUTH)  # Initialize Blynk
+blynk = Blynk(BLYNK_AUTH, server="blynk.cloud", port=80)  # Initialize Blynk
+
 
 def set_color(r, g, b, color_name):
     gpio.output(red_pin, r)    # Set red
@@ -33,7 +34,7 @@ def set_color(r, g, b, color_name):
     gpio.output(blue_pin, b)   # Set blue
     print(f"{color_name} LED ON")
 
-@blynk.on("V1")
+
 def menu_handler(value):
     selection = int(value[0])  # Get selected option
 
@@ -54,9 +55,14 @@ def menu_handler(value):
     elif selection == 8:
         set_color(0, 0, 0, "LED OFF")
 
-@blynk.on("connected")
+
 def blynk_connected():
     print("Blynk Connected")  # Connection status
+
+
+blynk.on("V1", menu_handler)
+blynk.on("connected", blynk_connected)
+
 
 try:
     while True:
