@@ -1,7 +1,7 @@
 """
 Components Used:
 1. Raspberry Pi
-2. RGB LED
+2. RGB LED (Common Cathode)
 3. Breadboard
 4. Jumper Wires
 5. Android Mobile (BlueDot App)

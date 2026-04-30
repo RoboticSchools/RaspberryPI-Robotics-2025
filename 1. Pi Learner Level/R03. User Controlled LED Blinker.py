@@ -18,8 +18,8 @@ try:
     blinks = int(input("Enter number of blinks: "))  # Get user input
 
     for i in range(blinks):
-        gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
         print(f"Blink {i+1}")
+        gpio.output(led_pin, gpio.HIGH)  # Turn LED ON
         time.sleep(1)  # Wait 1 second
 
         gpio.output(led_pin, gpio.LOW)   # Turn LED OFF

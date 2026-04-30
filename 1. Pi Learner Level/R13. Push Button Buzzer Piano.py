@@ -2,7 +2,7 @@
 Components Used:
 1. Raspberry Pi
 2. Buzzer
-3. 4 Push Buttons
+3. Four Push Buttons
 4. Breadboard
 5. Jumper Wires
 """
