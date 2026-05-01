@@ -1,14 +1,15 @@
 """
 Components Used:
 1. Raspberry Pi
-2. Ultrasonic Sensor (HC-SR04)
+2. Ultrasonic Sensor
 3. DC Motor HAT
 4. Robot Car (4 DC Motors)
+5. Jumper Wires
 """
 
-import time
 import RPi.GPIO as gpio
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 # ---------------- Ultrasonic Sensor Setup ----------------
 trigger_pin = 21   # GPIO for trigger

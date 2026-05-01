@@ -4,41 +4,54 @@ Components Used:
 2. DHT11 Sensor (Temperature & Humidity)
 3. Blynk Web App
 4. Jumper Wires
+
+Install Required Libraries:
+pip3 install adafruit-circuitpython-dht adafruit-blinka --break-system-packages
+pip3 install blynk-library-python --break-system-packages
 """
 
 import time
 import adafruit_dht
-import RPi.GPIO as GPIO
+import RPi.GPIO as gpio
 from BlynkLib import Blynk
+import board
 
 # ---------------- Blynk Setup ----------------
-blynk_auth = 'YOUR_BLYNK_AUTH_TOKEN'  # add your token
-blynk = Blynk(blynk_auth)
+BLYNK_AUTH = 'your_blynk_auth_token'  # Replace with your Blynk auth token
+blynk = Blynk(BLYNK_AUTH, server="blynk.cloud", port=80)
 
 # ---------------- GPIO Setup ----------------
-GPIO.setmode(GPIO.BCM)
-dht_pin = 17  # DHT11 data pin
+gpio.setmode(gpio.BCM)  # Use BCM numbering
 
 # ---------------- Sensor Setup ----------------
-dht_sensor = adafruit_dht.DHT11(dht_pin)
+dht_sensor = adafruit_dht.DHT11(board.D17)  # DHT11 connected to GPIO17
 
 # ---------------- Main Loop ----------------
 try:
     while True:
-        temperature = dht_sensor.temperature  # read temperature
-        humidity = dht_sensor.humidity        # read humidity
+        try:
+            # Read temperature and humidity from DHT11
+            temperature = dht_sensor.temperature
+            humidity = dht_sensor.humidity
 
-        if temperature is not None and humidity is not None:
-            print(f"Temperature: {temperature}°C, Humidity: {humidity}%")
+            # Check if readings are valid
+            if temperature is not None and humidity is not None:
+                print(f"Temperature: {temperature} C, Humidity: {humidity}%")
 
-            blynk.virtual_write(1, temperature)  # send temp to V1
-            blynk.virtual_write(2, humidity)     # send humidity to V2
-        else:
-            print("Sensor Error")
+                # Send values to Blynk app
+                blynk.virtual_write(1, temperature)  # V1 → Temperature
+                blynk.virtual_write(2, humidity)     # V2 → Humidity
+            else:
+                print("Sensor Error")
 
-        blynk.run()     # handle Blynk communication
-        time.sleep(2)   # update delay
+        except RuntimeError as error:
+            # Handle DHT timing errors
+            print("Read error:", error)
+
+        blynk.run()     # Maintain Blynk connection
+        time.sleep(2)   # Delay between readings
 
 except KeyboardInterrupt:
+    # Clean exit
     print("Exiting...")
-    GPIO.cleanup()
+    gpio.cleanup()

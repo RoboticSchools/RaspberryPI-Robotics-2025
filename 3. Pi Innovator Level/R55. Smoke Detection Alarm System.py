@@ -1,40 +1,45 @@
 """
 Components Used:
 1. Raspberry Pi
-2. MQ7 Gas Sensor (Digital Output)
+2. MQ7 Gas Sensor
 3. Buzzer
 4. Jumper Wires
 """
 
 import time
-import RPi.GPIO as GPIO
+import RPi.GPIO as gpio
 
 # ---------------- GPIO Setup ----------------
-GPIO.setmode(GPIO.BCM)  # use BCM numbering
+gpio.setmode(gpio.BCM)  # Use BCM pin numbering
 
-mq7_pin = 17      # MQ7 digital output
-buzzer_pin = 18   # buzzer pin
+mq7_pin = 21      # GPIO pin connected to MQ7 sensor
+buzzer_pin = 16   # GPIO pin connected to buzzer
 
-GPIO.setup(mq7_pin, GPIO.IN)        # sensor input
-GPIO.setup(buzzer_pin, GPIO.OUT)    # buzzer output
+# Set pin modes
+gpio.setup(mq7_pin, gpio.IN)      # MQ7 as input
+gpio.setup(buzzer_pin, gpio.OUT)  # Buzzer as output
 
 # ---------------- Main Loop ----------------
 try:
     print("Smoke Detection System Started...")
 
     while True:
-        smoke_detected = GPIO.input(mq7_pin)  # read sensor
+        # Read sensor value (1 = smoke detected, 0 = clean air)
+        smoke_detected = gpio.input(mq7_pin)
 
         if smoke_detected == 1:
-            GPIO.output(buzzer_pin, GPIO.HIGH)  # buzzer ON
+            # If smoke is detected → turn ON buzzer
+            gpio.output(buzzer_pin, gpio.HIGH)
             print("Smoke Detected!")
         else:
-            GPIO.output(buzzer_pin, GPIO.LOW)   # buzzer OFF
+            # If no smoke → turn OFF buzzer
+            gpio.output(buzzer_pin, gpio.LOW)
             print("Air Clean")
 
-        time.sleep(0.5)  # delay
+        time.sleep(0.5)  # Small delay for stability
 
 except KeyboardInterrupt:
-    GPIO.output(buzzer_pin, GPIO.LOW)  # turn OFF buzzer
-    GPIO.cleanup()  # reset GPIO
+    # Turn OFF buzzer and clean GPIO on exit
+    gpio.output(buzzer_pin, gpio.LOW)
+    gpio.cleanup()
     print("Exiting...")

@@ -13,8 +13,8 @@ import RPi.GPIO as gpio
 import time
 
 # GPIO Pin configuration
-trig = 21      # Trigger pin of HC-SR04
-echo = 20      # Echo pin of HC-SR04
+trig = 21      # Trigger pin
+echo = 20      # Echo pin
 red_led = 16   # Red LED pin
 green_led = 12 # Green LED pin
 buzzer = 26    # Buzzer pin
@@ -36,17 +36,15 @@ def get_distance():
     gpio.output(trig, False)
 
     # Wait for the echo pin to go HIGH
-    start_time = time.time()
     while gpio.input(echo) == 0:
         start_time = time.time()
 
     # Wait for the echo pin to go LOW
-    end_time = time.time()
     while gpio.input(echo) == 1:
-        end_time = time.time()
+        stop_time = time.time()
 
     # Calculate the distance in cm
-    duration = end_time - start_time
+    duration = stop_time - start_time
     distance = (duration * 34300) / 2  # Speed of sound = 343m/s
 
     return round(distance, 2)  # Return the distance rounded to 2 decimal places

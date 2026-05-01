@@ -2,41 +2,43 @@
 Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
-3. 2 IR Sensors (Left and Right)
+3. Two IR Sensors (Left and Right)
 4. Robot Car (4 DC Motors)
-5. Breadboard
-6. Jumper Wires
+5. Jumper Wires
 """
 
-import RPi.GPIO as GPIO
+import RPi.GPIO as gpio
 from Raspi_MotorHAT import Raspi_MotorHAT
 import time
 
 # ---------------- GPIO Setup ----------------
-GPIO.setmode(GPIO.BCM)
+gpio.setmode(gpio.BCM)  # Use BCM pin numbering
 
-left_sensor_pin = 21   # left IR sensor
-right_sensor_pin = 20  # right IR sensor
+left_sensor_pin = 21   # GPIO pin connected to LEFT IR sensor
+right_sensor_pin = 20  # GPIO pin connected to RIGHT IR sensor
 
 # ---------------- Motor Setup ----------------
-mh = Raspi_MotorHAT(addr=0x6f)
+mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT (I2C address)
 
+# Assign motors (based on Motor HAT ports)
 right_front_motor = mh.getMotor(1)
 right_back_motor  = mh.getMotor(2)
 left_front_motor  = mh.getMotor(3)
 left_back_motor   = mh.getMotor(4)
 
-speed = 150  # motor speed
+speed = 150  # Motor speed (0–255)
 
+# Set same speed for all motors
 for motor in (right_front_motor, right_back_motor, left_front_motor, left_back_motor):
     motor.setSpeed(speed)
 
 # ---------------- Sensor Setup ----------------
-GPIO.setup(left_sensor_pin, GPIO.IN)
-GPIO.setup(right_sensor_pin, GPIO.IN)
+gpio.setup(left_sensor_pin, gpio.IN)   # Set left sensor as input
+gpio.setup(right_sensor_pin, gpio.IN)  # Set right sensor as input
 
 # ---------------- Movement Functions ----------------
 def move_forward():
+    """Move robot straight forward"""
     print("Moving Forward")
     right_front_motor.run(Raspi_MotorHAT.FORWARD)
     right_back_motor.run(Raspi_MotorHAT.FORWARD)
@@ -44,6 +46,7 @@ def move_forward():
     left_back_motor.run(Raspi_MotorHAT.FORWARD)
 
 def move_backward():
+    """Move robot backward"""
     print("Moving Backward")
     right_front_motor.run(Raspi_MotorHAT.BACKWARD)
     right_back_motor.run(Raspi_MotorHAT.BACKWARD)
@@ -51,6 +54,7 @@ def move_backward():
     left_back_motor.run(Raspi_MotorHAT.BACKWARD)
 
 def turn_left():
+    """Turn robot left (right wheels forward, left wheels backward)"""
     print("Turning Left")
     right_front_motor.run(Raspi_MotorHAT.FORWARD)
     right_back_motor.run(Raspi_MotorHAT.FORWARD)
@@ -58,6 +62,7 @@ def turn_left():
     left_back_motor.run(Raspi_MotorHAT.BACKWARD)
 
 def turn_right():
+    """Turn robot right (left wheels forward, right wheels backward)"""
     print("Turning Right")
     right_front_motor.run(Raspi_MotorHAT.BACKWARD)
     right_back_motor.run(Raspi_MotorHAT.BACKWARD)
@@ -65,6 +70,7 @@ def turn_right():
     left_back_motor.run(Raspi_MotorHAT.FORWARD)
 
 def stop_motors():
+    """Stop all motors"""
     print("Stopping Motors")
     right_front_motor.run(Raspi_MotorHAT.RELEASE)
     right_back_motor.run(Raspi_MotorHAT.RELEASE)
@@ -74,24 +80,34 @@ def stop_motors():
 # ---------------- Main Loop ----------------
 try:
     while True:
-        left_sensor = GPIO.input(left_sensor_pin)    # read left sensor
-        right_sensor = GPIO.input(right_sensor_pin)  # read right sensor
+        # Read sensor values
+        left_sensor = gpio.input(left_sensor_pin)
+        right_sensor = gpio.input(right_sensor_pin)
 
-        if left_sensor == GPIO.HIGH and right_sensor == GPIO.LOW:
-            turn_right()      # left off line → turn right
+        # Logic for line following:
+        # LOW  = line detected
+        # HIGH = no line
 
-        elif left_sensor == GPIO.LOW and right_sensor == GPIO.HIGH:
-            turn_left()       # right off line → turn left
+        if left_sensor == gpio.HIGH and right_sensor == gpio.LOW:
+            # Left sensor off line → turn right
+            turn_right()
 
-        elif left_sensor == GPIO.LOW and right_sensor == GPIO.LOW:
-            move_forward()    # both on line → forward
+        elif left_sensor == gpio.LOW and right_sensor == gpio.HIGH:
+            # Right sensor off line → turn left
+            turn_left()
+
+        elif left_sensor == gpio.LOW and right_sensor == gpio.LOW:
+            # Both sensors on line → move forward
+            move_forward()
 
         else:
-            stop_motors()     # both off line → stop
+            # Both sensors off line → stop
+            stop_motors()
 
-        time.sleep(0.1)
+        time.sleep(0.1)  # Small delay for stability
 
 except KeyboardInterrupt:
+    # Clean exit when program is stopped
     print("Exiting...")
     stop_motors()
-    GPIO.cleanup()
+    gpio.cleanup()

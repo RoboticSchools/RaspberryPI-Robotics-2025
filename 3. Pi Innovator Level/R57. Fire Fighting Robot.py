@@ -2,21 +2,22 @@
 Components Used:
 1. Raspberry Pi
 2. MQ7 Gas Sensor
-3. DC Motor HAT (Robot Car)
-4. Water Pump (Motor)
-5. Buzzer
-6. Jumper Wires
+3. DC Motor HAT
+4. Robot Car (4 DC Motors)
+5. Water Pump
+6. Buzzer
+7. Jumper Wires
 """
 
-import time
 import RPi.GPIO as GPIO
 from Raspi_MotorHAT import Raspi_MotorHAT
+import time
 
 # ---------------- GPIO Setup ----------------
 GPIO.setmode(GPIO.BCM)  # BCM mode
 
-mq7_pin = 17        # gas sensor
-buzzer_pin = 18     # buzzer
+mq7_pin = 21        # gas sensor
+buzzer_pin = 16     # buzzer
 
 GPIO.setup(mq7_pin, GPIO.IN)        # sensor input
 GPIO.setup(buzzer_pin, GPIO.OUT)    # buzzer output
@@ -73,7 +74,7 @@ try:
             stop_robot()  # stop near fire
 
             start_pump()  # spray water
-            time.sleep(5)
+            time.sleep(3)
 
             stop_pump()  # stop spraying
             GPIO.output(buzzer_pin, GPIO.LOW)  # buzzer OFF

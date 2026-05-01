@@ -1,9 +1,10 @@
 """
 Components Used:
 1. Raspberry Pi
-2. Ultrasonic Sensor (HC-SR04)
-3. Servo Motor
-4. Jumper Wires
+2. DC Motor Hat
+3. Ultrasonic Sensor
+4. Servo Motor
+5. Jumper Wires
 """
 
 import numpy as np
@@ -33,9 +34,6 @@ def get_distance():
     gpio.output(trig, True)     # trigger pulse
     time.sleep(0.00001)
     gpio.output(trig, False)
-
-    start_time = time.time()
-    end_time = time.time()
 
     while gpio.input(echo) == 0:   # wait for HIGH
         start_time = time.time()

@@ -1,7 +1,7 @@
 """
 Components Used:
 1. Raspberry Pi
-2. Ultrasonic Sensor (HC-SR04)
+2. Ultrasonic Sensor
 3. Breadboard
 4. Jumper Wires
 """
@@ -26,9 +26,6 @@ def get_distance():
     gpio.output(trig_pin, True)
     time.sleep(0.00001)
     gpio.output(trig_pin, False)
-
-    start_time = time.time()
-    stop_time = time.time()
 
     # wait for echo to go HIGH
     while gpio.input(echo_pin) == 0:

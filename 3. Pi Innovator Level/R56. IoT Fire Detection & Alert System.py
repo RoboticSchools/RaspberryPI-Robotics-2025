@@ -8,47 +8,54 @@ Components Used:
 """
 
 import time
-import RPi.GPIO as GPIO
+import RPi.GPIO as gpio
 from BlynkLib import Blynk
 
-# Blynk setup
-BLYNK_AUTH = "YOUR_BLYNK_AUTH_TOKEN"  # auth token
-blynk = Blynk(BLYNK_AUTH)  # init Blynk
+# ---------------- Blynk Setup ----------------
+BLYNK_AUTH = 'your_blynk_auth_token'  # Replace with your Blynk auth token
+blynk = Blynk(BLYNK_AUTH, server="blynk.cloud", port=80)  # Initialize Blynk connection
 
-# GPIO setup
-GPIO.setmode(GPIO.BCM)  # BCM mode
+# ---------------- GPIO Setup ----------------
+gpio.setmode(gpio.BCM)  # Use BCM pin numbering
 
-mq7_pin = 17      # MQ7 pin
-buzzer_pin = 18   # buzzer pin
+mq7_pin = 21      # GPIO pin connected to MQ7 sensor (digital output)
+buzzer_pin = 16   # GPIO pin connected to buzzer
 
-GPIO.setup(mq7_pin, GPIO.IN)        # sensor input
-GPIO.setup(buzzer_pin, GPIO.OUT)    # buzzer output
+# Set pin modes
+gpio.setup(mq7_pin, gpio.IN)      # MQ7 sensor as input
+gpio.setup(buzzer_pin, gpio.OUT)  # Buzzer as output
 
-# main loop
+# ---------------- Main Loop ----------------
 try:
     print("IoT Fire Detection Started...")
 
     while True:
-        smoke = GPIO.input(mq7_pin)  # read sensor
+        # Read value from MQ7 sensor (1 = smoke detected, 0 = clean air)
+        smoke = gpio.input(mq7_pin)
 
         if smoke == 1:
-            GPIO.output(buzzer_pin, GPIO.HIGH)  # buzzer ON
+            # Smoke detected → turn ON buzzer and send alert
+            gpio.output(buzzer_pin, gpio.HIGH)
             print("Fire/Smoke Detected")
 
-            blynk.virtual_write(1, 1)  # alert ON
-            blynk.virtual_write(2, "FIRE ALERT")  # message
+            # Send alert status to Blynk
+            blynk.virtual_write(1, 1)          # V1 → LED/Indicator ON
+            blynk.virtual_write(2, "FIRE ALERT")  # V2 → Display message
 
         else:
-            GPIO.output(buzzer_pin, GPIO.LOW)  # buzzer OFF
+            # No smoke → turn OFF buzzer and send safe status
+            gpio.output(buzzer_pin, gpio.LOW)
             print("Safe Environment")
 
-            blynk.virtual_write(1, 0)  # alert OFF
-            blynk.virtual_write(2, "Safe")  # message
+            # Update Blynk with safe status
+            blynk.virtual_write(1, 0)       # V1 → LED OFF
+            blynk.virtual_write(2, "Safe")  # V2 → Display message
 
-        blynk.run()  # handle Blynk
-        time.sleep(1)  # delay
+        blynk.run()      # Handle Blynk communication
+        time.sleep(1)    # Delay to avoid rapid updates
 
 except KeyboardInterrupt:
-    GPIO.output(buzzer_pin, GPIO.LOW)  # buzzer OFF
-    GPIO.cleanup()  # reset GPIO
+    # Safe shutdown when program is stopped
+    gpio.output(buzzer_pin, gpio.LOW)  # Turn OFF buzzer
+    gpio.cleanup()                     # Reset GPIO pins
     print("Exiting...")

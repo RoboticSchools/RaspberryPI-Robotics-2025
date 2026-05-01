@@ -7,50 +7,61 @@ Components Used:
 5. Jumper Wires
 """
 
-import RPi.GPIO as GPIO
+import RPi.GPIO as gpio
 import time
 from Raspi_MotorHAT import Raspi_MotorHAT
 
-# Initialize Motor HAT (Default I2C address 0x6F)
-mh = Raspi_MotorHAT(addr=0x6f)
+# ---------------- Motor HAT Setup ----------------
+mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT (I2C address)
 
-# Create motor object for the water pump
+# Assign motor channel for water pump
 water_pump = mh.getMotor(1)
 
-# Set motor speed (0-255)
+# Set pump speed (0–255)
 water_pump.setSpeed(150)
 
-# Setup GPIO mode and pins
-GPIO.setmode(GPIO.BCM)
-ir_sensor_pin = 21
-# Set up the IR sensor pin
-GPIO.setup(ir_sensor_pin, GPIO.IN)
+# ---------------- GPIO Setup ----------------
+gpio.setmode(gpio.BCM)  # Use BCM pin numbering
 
+ir_sensor_pin = 21  # GPIO pin connected to IR sensor
+
+# Set IR sensor pin as input
+gpio.setup(ir_sensor_pin, gpio.IN)
+
+# ---------------- Pump Control Functions ----------------
 def turn_on_water_pump():
+    """Turn ON the water pump"""
     print("Water Pump ON")
-    water_pump.run(Raspi_MotorHAT.FORWARD)  # Turn on water pump
+    water_pump.run(Raspi_MotorHAT.FORWARD)
 
 def turn_off_water_pump():
+    """Turn OFF the water pump"""
     print("Water Pump OFF")
-    water_pump.run(Raspi_MotorHAT.RELEASE)  # Turn off water pump
+    water_pump.run(Raspi_MotorHAT.RELEASE)
 
+# ---------------- Main Loop ----------------
 try:
     while True:
-        # Read the value from the IR sensor
-        ir_sensor_value = GPIO.input(ir_sensor_pin)
+        # Read IR sensor value
+        ir_sensor_value = gpio.input(ir_sensor_pin)
+
+        # IR Sensor Logic:
+        # 0 (LOW)  → Object detected
+        # 1 (HIGH) → No object
 
         if ir_sensor_value == 0:
-            # If IR sensor detects an object
+            # Object detected → activate pump
             turn_on_water_pump()
-            time.sleep(3)  # Keep the pump on for 3 seconds
+            time.sleep(3)  # Keep pump ON for 3 seconds
             turn_off_water_pump()
         else:
-            # If no object is detected, ensure the pump is off
+            # No object → keep pump OFF
             turn_off_water_pump()
 
-        time.sleep(0.1)  # Small delay to avoid rapid switching
+        time.sleep(0.1)  # Small delay to prevent rapid switching
 
 except KeyboardInterrupt:
+    # Safe exit when program is stopped
     print("Exiting...")
     turn_off_water_pump()
-    GPIO.cleanup()  # Clean up GPIO settings
+    gpio.cleanup()

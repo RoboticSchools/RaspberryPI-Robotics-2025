@@ -7,11 +7,16 @@ Components Used:
 5. ADS1115 Module
 6. Breadboard
 7. Jumper Wires
+
+Install Required Libraries:
+pip install adafruit-circuitpython-ads1x15 --break-system-packages
+pip install adafruit-blinka --break-system-packages
 """
 
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 from Raspi_MotorHAT import Raspi_MotorHAT
+import numpy as np
 import board
 import time
 import busio
@@ -23,7 +28,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1115(i2c)
 
 # Define the analog input channel for the moisture sensor (connected to P0)
-channel = AnalogIn(ads, ADS.P0)
+channel = AnalogIn(ads, 0)
 
 # Initialize Motor HAT (Default I2C address 0x6F)
 mh = Raspi_MotorHAT(addr=0x6f)
@@ -45,13 +50,12 @@ def turn_off_water_pump():
 try:
     while True:
         # Read the soil moisture value (analog value)
-        moisture_value = channel.value
-
+        moisture_value = int(np.interp(channel.value, [0, 32767], [0, 100]))
         # Print the soil moisture value
         print(f"Soil Moisture Value: {moisture_value}")
 
         # If soil moisture is below a threshold, turn on the water pump
-        if moisture_value < 2000:  # Adjust this threshold based on your soil moisture sensor calibration
+        if moisture_value < 35:  # Adjust this threshold based on your soil moisture sensor calibration
             turn_on_water_pump()
             time.sleep(3)  # Run the pump for 3 seconds
             turn_off_water_pump()
