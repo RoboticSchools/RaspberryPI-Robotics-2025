@@ -3,90 +3,81 @@ Components Used:
 1. Raspberry Pi
 2. OLED Display (128x64, SSD1306 I2C)
 3. LDR Sensor (Digital Output)
-4. Ultrasonic Sensor (HC-SR04)
+4. PIR Motion Sensor
 5. DHT11 Sensor
 6. Jumper Wires
+
+Install Required Library:
+pip install adafruit-circuitpython-ssd1306 pillow adafruit-circuitpython-dht lgpio --break-system-packages
 """
 
+# Import required libraries
 import time
 import board
 import busio
-import RPi.GPIO as GPIO
+import lgpio
 import adafruit_dht
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
-# ---------------- GPIO Setup ----------------
-GPIO.setmode(GPIO.BCM)  # use BCM numbering
+# ---------------- GPIO Setup (lgpio) ----------------
+chip = lgpio.gpiochip_open(0)
 
 ldr_pin = 21  # LDR pin
-trig = 23     # ultrasonic trigger
-echo = 24     # ultrasonic echo
+pir_pin = 23  # PIR pin
 
-GPIO.setup(ldr_pin, GPIO.IN)  # LDR input
-GPIO.setup(trig, GPIO.OUT)    # trigger output
-GPIO.setup(echo, GPIO.IN)     # echo input
+lgpio.gpio_claim_input(chip, ldr_pin)
+lgpio.gpio_claim_input(chip, pir_pin)
 
 # ---------------- DHT11 Setup ----------------
-dht = adafruit_dht.DHT11(board.D17)  # DHT11 pin
+dht = adafruit_dht.DHT11(board.D17)
 
 # ---------------- OLED Setup ----------------
-i2c = busio.I2C(board.SCL, board.SDA)  # I2C init
-oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)  # display init
+i2c = busio.I2C(board.SCL, board.SDA)
+oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
 
-width, height = oled.width, oled.height  # screen size
-image = Image.new("1", (width, height))  # create image
-draw = ImageDraw.Draw(image)  # draw object
-font = ImageFont.load_default()  # font
-
-# ---------------- Ultrasonic Function ----------------
-def get_distance():
-    GPIO.output(trig, False)  # low trigger
-    time.sleep(0.05)  # settle
-
-    GPIO.output(trig, True)  # send pulse
-    time.sleep(0.00001)
-    GPIO.output(trig, False)
-
-    start = time.time()
-    stop = time.time()
-
-    while GPIO.input(echo) == 0:
-        start = time.time()  # wait HIGH
-
-    while GPIO.input(echo) == 1:
-        stop = time.time()  # wait LOW
-
-    return round((stop - start) * 17150, 2)  # distance cm
+# ---------------- Image Buffer ----------------
+width, height = oled.width, oled.height
+image = Image.new("1", (width, height))
+draw = ImageDraw.Draw(image)
+font = ImageFont.load_default()
 
 # ---------------- Main Loop ----------------
 try:
-    print("Sensor Dashboard Started...")
-
     while True:
-        ldr_state = GPIO.input(ldr_pin)  # read LDR
+        # Read LDR
+        ldr_state = lgpio.gpio_read(chip, ldr_pin)
+        light_status = "Dark" if ldr_state == 1 else "Light"
 
-        light_status = "Dark" if ldr_state == 1 else "Light"  # LDR status
+        # Read PIR
+        pir_state = lgpio.gpio_read(chip, pir_pin)
+        motion_status = "Motion" if pir_state == 1 else "No Motion"
 
-        distance = get_distance()  # ultrasonic distance
+        # Read DHT11
+        try:
+            temp = dht.temperature
+            hum = dht.humidity
+        except RuntimeError:
+            temp = "Err"
+            hum = "Err"
 
-        temp = dht.temperature  # temperature
-        hum = dht.humidity      # humidity
+        # Clear screen
+        draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-        draw.rectangle((0, 0, width, height), outline=0, fill=0)  # clear screen
+        # Display data
+        draw.text((0, 0), f"LDR: {light_status}", font=font, fill=255)
+        draw.text((0, 15), f"PIR: {motion_status}", font=font, fill=255)
+        draw.text((0, 30), f"Temp: {temp}C", font=font, fill=255)
+        draw.text((0, 45), f"Hum: {hum}%", font=font, fill=255)
 
-        draw.text((0, 0), f"LDR: {light_status}", font=font, fill=255)  # show LDR
-        draw.text((0, 15), f"Dist: {distance}cm", font=font, fill=255)  # show distance
-        draw.text((0, 30), f"Temp: {temp}C", font=font, fill=255)  # show temp
-        draw.text((0, 45), f"Hum: {hum}%", font=font, fill=255)  # show humidity
+        oled.image(image)
+        oled.show()
 
-        oled.image(image)  # send image
-        oled.show()        # update display
+        time.sleep(2)
 
-        time.sleep(2)  # delay
-
+# Cleanup
 except KeyboardInterrupt:
-    oled.fill(0)  # clear display
+    oled.fill(0)
     oled.show()
-    GPIO.cleanup()  # reset GPIO
+    lgpio.gpiochip_close(chip)
     print("Exiting...")

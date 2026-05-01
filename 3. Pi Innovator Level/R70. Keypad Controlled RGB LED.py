@@ -9,21 +9,22 @@ Components Used:
 
 import time
 import RPi.GPIO as GPIO
-from pad4pi import Keypad
 
 # ---------------- GPIO Setup ----------------
-GPIO.setmode(GPIO.BCM)  # use BCM numbering
+GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering (GPIO17, GPIO27, etc.)
 
-red_pin = 17    # RED pin
-green_pin = 27  # GREEN pin
-blue_pin = 22   # BLUE pin
+# RGB LED pins (connect to resistor → LED → GND)
+red_pin = 17    # RED LED pin
+green_pin = 27  # GREEN LED pin
+blue_pin = 22   # BLUE LED pin
 
-# set RGB pins as output
+# Set RGB pins as OUTPUT so we can control ON/OFF
 GPIO.setup(red_pin, GPIO.OUT)
 GPIO.setup(green_pin, GPIO.OUT)
 GPIO.setup(blue_pin, GPIO.OUT)
 
 # ---------------- Keypad Setup ----------------
+# Define keypad button layout (same as physical keypad)
 keypad_layout = [
     ["1", "2", "3", "A"],
     ["4", "5", "6", "B"],
@@ -31,53 +32,89 @@ keypad_layout = [
     ["*", "0", "#", "D"]
 ]
 
-row_pins = [5, 6, 13, 19]   # row pins
-col_pins = [12, 16, 20, 21] # column pins
+# GPIO pins connected to keypad rows and columns
+row_pins = [5, 6, 13, 19]   # Row pins (outputs)
+col_pins = [12, 16, 20, 21] # Column pins (inputs)
 
-factory = Keypad.factory()
-keypad = factory.create_keypad(
-    keypad=keypad_layout,
-    row_pins=row_pins,
-    col_pins=col_pins
-)
+# Set all row pins as OUTPUT and default HIGH (inactive)
+for row in row_pins:
+    GPIO.setup(row, GPIO.OUT)
+    GPIO.output(row, GPIO.HIGH)
+
+# Set all column pins as INPUT with pull-down resistors
+# This ensures stable LOW when no key is pressed
+for col in col_pins:
+    GPIO.setup(col, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # ---------------- RGB Control Function ----------------
 def set_color(r, g, b):
-    GPIO.output(red_pin, r)     # control RED
-    GPIO.output(green_pin, g)   # control GREEN
-    GPIO.output(blue_pin, b)    # control BLUE
+    """
+    Control RGB LED color
+    r, g, b values:
+    1 = ON, 0 = OFF
+    """
+    GPIO.output(red_pin, r)     # Turn RED ON/OFF
+    GPIO.output(green_pin, g)   # Turn GREEN ON/OFF
+    GPIO.output(blue_pin, b)    # Turn BLUE ON/OFF
 
-# ---------------- Key Press Handler ----------------
-def on_key_pressed(key):
-    print(f"Key Pressed: {key}")
+# ---------------- Key Detection Function ----------------
+def read_key():
+    """
+    Scan keypad to detect which key is pressed
+    Method:
+    1. Activate one row at a time (set LOW)
+    2. Check all columns
+    3. If column reads HIGH → key is pressed
+    """
 
-    # select color based on key
-    if key == "1":
-        set_color(1, 0, 0)  # Red
-    elif key == "2":
-        set_color(0, 1, 0)  # Green
-    elif key == "3":
-        set_color(0, 0, 1)  # Blue
-    elif key == "4":
-        set_color(1, 1, 0)  # Yellow
-    elif key == "5":
-        set_color(1, 0, 1)  # Magenta
-    elif key == "6":
-        set_color(0, 1, 1)  # Cyan
-    elif key == "7":
-        set_color(1, 1, 1)  # White
-    elif key == "0":
-        set_color(0, 0, 0)  # OFF
+    for i, row in enumerate(row_pins):
+        GPIO.output(row, GPIO.LOW)  # Activate current row
 
-keypad.registerKeyPressHandler(on_key_pressed)
+        # Check each column for HIGH signal
+        for j, col in enumerate(col_pins):
+            if GPIO.input(col) == GPIO.HIGH:
+                time.sleep(0.2)  # Debounce delay (avoid multiple detection)
+
+                GPIO.output(row, GPIO.HIGH)  # Deactivate row
+
+                # Return the pressed key from layout
+                return keypad_layout[i][j]
+
+        GPIO.output(row, GPIO.HIGH)  # Deactivate row after scanning
+
+    return None  # No key pressed
 
 # ---------------- Main Loop ----------------
 try:
     print("RGB 8 Color Control Started...")
 
     while True:
-        time.sleep(0.1)  # keep program running
+        key = read_key()  # Check for key press
 
+        if key:
+            print(f"Key Pressed: {key}")
+
+            # Map keys to colors
+            if key == "1":
+                set_color(1, 0, 0)  # Red
+            elif key == "2":
+                set_color(0, 1, 0)  # Green
+            elif key == "3":
+                set_color(0, 0, 1)  # Blue
+            elif key == "4":
+                set_color(1, 1, 0)  # Yellow (Red + Green)
+            elif key == "5":
+                set_color(1, 0, 1)  # Magenta (Red + Blue)
+            elif key == "6":
+                set_color(0, 1, 1)  # Cyan (Green + Blue)
+            elif key == "7":
+                set_color(1, 1, 1)  # White (All ON)
+            elif key == "0":
+                set_color(0, 0, 0)  # OFF (All OFF)
+
+        time.sleep(0.1)  # Small delay to reduce CPU usage
+
+# ---------------- Cleanup ----------------
 except KeyboardInterrupt:
     print("Exiting...")
-    GPIO.cleanup()  # reset GPIO
+    GPIO.cleanup()  # Reset all GPIO pins safely
