@@ -1,94 +1,124 @@
 """
 Components Used:
-- Raspberry Pi
-- 4x4 Keypad (Matrix Type)
-- Servo Motor (SG90)
-- I2C LCD Display (PCF8574)
-- Jumper Wires
+1. Raspberry Pi
+2. 4x4 Keypad
+3. Servo Motor (via PWM Driver)
+4. I2C LCD Display
+5. Jumper Wires
+
+Install Required Library:
+pip install RPLCD numpy --break-system-packages
 """
 
+# Import required libraries
 import time
-import RPi.GPIO as GPIO
-from pad4pi import Keypad
+import numpy as np
+import RPi.GPIO as gpio
 from RPLCD.i2c import CharLCD
+from Raspi_PWM_Servo_Driver import PWM
 
-# Initialize LCD (I2C address 0x27, 16x2 display)
-lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
+# ---------------- LCD Setup ----------------
+lcd_display = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
 
-# Define the keypad layout (4x4 matrix)
-KEYPAD = [
-    ["1", "2", "3", "A"],
-    ["4", "5", "6", "B"],
-    ["7", "8", "9", "C"],
-    ["*", "0", "#", "D"]
+# ---------------- Keypad Layout ----------------
+keypad_layout = [
+    ["1","2","3","A"],
+    ["4","5","6","B"],
+    ["7","8","9","C"],
+    ["*","0","#","D"]
 ]
 
-# Define GPIO pins for keypad rows and columns
-ROW_PINS = [5, 6, 13, 19] 
-COL_PINS = [12, 16, 20, 21]
+row_pins = [5, 6, 13, 19]
+column_pins = [12, 16, 20, 21]
 
-# Initialize keypad using the pad4pi library
-factory = Keypad.factory()
-keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS)
+# ---------------- GPIO Setup ----------------
+gpio.setmode(gpio.BCM)
 
-# Servo motor setup
-SERVO_PIN = 18
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SERVO_PIN, GPIO.OUT)
-servo = GPIO.PWM(SERVO_PIN, 50)  # 50Hz PWM frequency
-servo.start(0)
+# Set rows as OUTPUT (HIGH)
+for row_pin in row_pins:
+    gpio.setup(row_pin, gpio.OUT)
+    gpio.output(row_pin, gpio.HIGH)
 
-# Password variables
-password = "1234"
-input_password = ""
+# Set columns as INPUT
+for column_pin in column_pins:
+    gpio.setup(column_pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
-# Function to move servo
+# ---------------- Servo Setup (PWM Driver) ----------------
+pwm_driver = PWM(0x6F)
+pwm_driver.setPWMFreq(60)
+
+servo_channel = 0
+
+def angle_to_pwm(angle):
+    return int(np.interp(angle, [0, 180], [150, 600]))
+
 def unlock_door():
-    servo.ChangeDutyCycle(7.5)  # Rotate to 90 degrees (unlock)
+    pwm_driver.setPWM(servo_channel, 0, angle_to_pwm(90))  # Unlock
     time.sleep(3)
-    servo.ChangeDutyCycle(2.5)  # Rotate back to 0 degrees (lock)
+    pwm_driver.setPWM(servo_channel, 0, angle_to_pwm(0))   # Lock
 
-# Display initial message on LCD
-lcd.clear()
-lcd.write_string("Enter Password:")
+# ---------------- Password ----------------
+correct_password = "1234"
+entered_password = ""
 
-# Function to handle key press events
-def key_pressed(key):
-    global input_password
-    lcd.clear()
+# ---------------- Display Initial ----------------
+lcd_display.clear()
+lcd_display.write_string("Enter Password:")
 
-    if key not in ("#", "*"):  # Add key to password input
-        input_password += key
-        lcd.write_string(input_password)
+# ---------------- Read Keypad ----------------
+def read_keypad():
+    for row_index, row_pin in enumerate(row_pins):
+        gpio.output(row_pin, gpio.LOW)
 
-    elif key == "#":  # Submit password
-        lcd.clear()
-        if input_password == password:
-            lcd.write_string("Access Granted")
-            unlock_door()
-        else:
-            lcd.write_string("Access Denied")
+        for col_index, column_pin in enumerate(column_pins):
+            if gpio.input(column_pin) == gpio.HIGH:
+                time.sleep(0.2)  # debounce
+                gpio.output(row_pin, gpio.HIGH)
+                return keypad_layout[row_index][col_index]
 
-        time.sleep(2)
-        input_password = ""  # Reset input
-        lcd.clear()
-        lcd.write_string("Enter Password:")
+        gpio.output(row_pin, gpio.HIGH)
 
-    elif key == "*":  # Clear input
-        input_password = ""
-        lcd.clear()
-        lcd.write_string("Enter Password:")
+    return None
 
-# Register keypad event handler
-keypad.registerKeyPressHandler(key_pressed)
-
+# ---------------- Main Loop ----------------
 try:
     while True:
-        time.sleep(0.1)  # Prevent excessive CPU usage
+        pressed_key = read_keypad()
 
+        if pressed_key:
+            lcd_display.clear()
+
+            # ---- Add input ----
+            if pressed_key not in ("#", "*"):
+                entered_password += pressed_key
+                lcd_display.write_string(entered_password)
+
+            # ---- Submit ----
+            elif pressed_key == "#":
+                lcd_display.clear()
+
+                if entered_password == correct_password:
+                    lcd_display.write_string("Access Granted")
+                    unlock_door()
+                else:
+                    lcd_display.write_string("Access Denied")
+
+                time.sleep(2)
+                entered_password = ""
+                lcd_display.clear()
+                lcd_display.write_string("Enter Password:")
+
+            # ---- Clear ----
+            elif pressed_key == "*":
+                entered_password = ""
+                lcd_display.clear()
+                lcd_display.write_string("Enter Password:")
+
+        time.sleep(0.1)
+
+# ---------------- Cleanup ----------------
 except KeyboardInterrupt:
-    print("\nExiting...")
-    GPIO.cleanup()  # Cleanup GPIO on exit
-    lcd.clear()
-    lcd.write_string("System Stopped")
-    time.sleep(2)
+    gpio.cleanup()
+    lcd_display.clear()
+    lcd_display.write_string("Stopped")
+    print("Exiting...")

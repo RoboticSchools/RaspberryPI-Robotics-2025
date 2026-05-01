@@ -1,97 +1,104 @@
 """
 Components Used:
 1. Raspberry Pi
-2. 4x4 Keypad (Matrix Type)
-3. I2C LCD Display (PCF8574)
+2. 4x4 Keypad
+3. I2C LCD Display
 4. Jumper Wires
 """
 
 import time
-import sys
-import RPi.GPIO as GPIO
-from pad4pi import Keypad
+import RPi.GPIO as gpio
 from RPLCD.i2c import CharLCD
 
 # ---------------- LCD Setup ----------------
-lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
+lcd_display = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
 
-# ---------------- Keypad Setup ----------------
+# ---------------- Keypad Layout ----------------
 keypad_layout = [
-    ["1", "2", "3", "A"],
-    ["4", "5", "6", "B"],
-    ["7", "8", "9", "C"],
-    ["*", "0", "#", "D"]
+    ["1","2","3","A"],
+    ["4","5","6","B"],
+    ["7","8","9","C"],
+    ["*","0","#","D"]
 ]
 
-row_pins = [5, 6, 13, 19]   # row pins
-col_pins = [12, 16, 20, 21] # column pins
+# Define GPIO pins for rows and columns
+row_pins = [5, 6, 13, 19]
+column_pins = [12, 16, 20, 21]
 
-factory = Keypad.factory()
-keypad = factory.create_keypad(
-    keypad=keypad_layout,
-    row_pins=row_pins,
-    col_pins=col_pins
-)
+# ---------------- GPIO Setup ----------------
+gpio.setmode(gpio.BCM)  # Use BCM numbering
+
+# Set row pins as OUTPUT (default HIGH)
+for row_pin in row_pins:
+    gpio.setup(row_pin, gpio.OUT)
+    gpio.output(row_pin, gpio.HIGH)
+
+# Set column pins as INPUT with pull-down
+for column_pin in column_pins:
+    gpio.setup(column_pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
 # ---------------- Voting Data ----------------
-vote_counts = {"A": 0, "B": 0, "C": 0, "D": 0}  # store votes
+vote_counts = {
+    "A": 0,
+    "B": 0,
+    "C": 0,
+    "D": 0
+}
 
-# ---------------- Display Functions ----------------
-def show_intro():
-    lcd.clear()
-    lcd.write_string("Get Ready\nTo Vote!")
-    time.sleep(3)
-    lcd.clear()
+# ---------------- Function: Read Keypad ----------------
+def read_keypad():
+    """
+    Scan keypad:
+    1. Set one row LOW at a time
+    2. Check all column pins
+    3. If HIGH detected → key pressed
+    """
+    for row_index, row_pin in enumerate(row_pins):
+        gpio.output(row_pin, gpio.LOW)  # Activate row
 
-def show_options():
-    lcd.clear()
-    lcd.write_string("Vote A  Vote B\nVote C  Vote D")
+        for col_index, column_pin in enumerate(column_pins):
+            if gpio.input(column_pin) == gpio.HIGH:
+                time.sleep(0.2)  # Debounce delay
+                gpio.output(row_pin, gpio.HIGH)
+                return keypad_layout[row_index][col_index]
 
-# ---------------- Key Press Handler ----------------
-def on_key_pressed(key):
-    lcd.clear()
+        gpio.output(row_pin, gpio.HIGH)  # Deactivate row
 
-    if key in vote_counts:
-        vote_counts[key] += 1          # increase vote count
-        lcd.write_string(f"Voted {key}")
+    return None  # No key pressed
 
-    elif key == "#":                  # show results
-        lcd.write_string(f"A:{vote_counts['A']} B:{vote_counts['B']}\n")
-        lcd.write_string(f"C:{vote_counts['C']} D:{vote_counts['D']}")
-        time.sleep(3)
-
-        # find highest votes
-        max_votes = max(vote_counts.values())
-
-        # get winner(s)
-        winners = [k for k, v in vote_counts.items() if v == max_votes]
-
-        lcd.clear()
-        lcd.write_string("Winner(s):\n" + " ".join(winners))
-        time.sleep(5)
-
-        GPIO.cleanup()                # cleanup GPIO
-        lcd.clear()
-        lcd.write_string("Voting Done")
-        time.sleep(2)
-        sys.exit()                    # exit program
-
-    time.sleep(2)
-    show_options()                    # show menu again
-
-keypad.registerKeyPressHandler(on_key_pressed)
-
-# ---------------- Main Loop ----------------
+# ---------------- Main Program ----------------
 try:
-    show_intro()      # display welcome
-    show_options()    # display options
+    lcd_display.clear()
+    lcd_display.write_string("A B C D Vote")
 
     while True:
-        time.sleep(0.1)  # keep program running
+        pressed_key = read_keypad()  # Read keypad
 
+        if pressed_key:
+            lcd_display.clear()
+
+            # ---- Voting ----
+            if pressed_key in vote_counts:
+                vote_counts[pressed_key] += 1
+                lcd_display.write_string("Voted " + pressed_key)
+
+            # ---- Show Results ----
+            elif pressed_key == "#":
+                lcd_display.write_string(
+                    "A:" + str(vote_counts["A"]) + " B:" + str(vote_counts["B"]) + "\n" +
+                    "C:" + str(vote_counts["C"]) + " D:" + str(vote_counts["D"])
+                )
+                time.sleep(3)
+
+            # Return to menu
+            time.sleep(2)
+            lcd_display.clear()
+            lcd_display.write_string("A B C D Vote")
+
+        time.sleep(0.1)  # Small delay
+
+# ---------------- Cleanup ----------------
 except KeyboardInterrupt:
-    print("Exiting...")
-    GPIO.cleanup()      # reset GPIO
-    lcd.clear()
-    lcd.write_string("System Stopped")
-    time.sleep(2)
+    gpio.cleanup()
+    lcd_display.clear()
+    print("Program stopped")

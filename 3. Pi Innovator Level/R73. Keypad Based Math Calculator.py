@@ -1,79 +1,102 @@
 """
 Components Used:
-- Raspberry Pi
-- 4x4 Keypad (Matrix Type)
-- I2C LCD Display (PCF8574)
-- Jumper Wires
+1. Raspberry Pi
+2. 4x4 Keypad
+3. I2C LCD Display
+4. Jumper Wires
 """
 
 import time
-import RPi.GPIO as GPIO
-from pad4pi import Keypad
+import RPi.GPIO as gpio
 from RPLCD.i2c import CharLCD
 
-# Initialize LCD (I2C address 0x27, 16x2 display)
-lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
+# ---------------- LCD Setup ----------------
+lcd_display = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
 
-# Define the keypad layout (4x4 matrix)
-KEYPAD = [
+# ---------------- Keypad Layout ----------------
+keypad_layout = [
     ["1", "2", "3", "+"],
     ["4", "5", "6", "-"],
     ["7", "8", "9", "*"],
     ["C", "0", "=", "/"]
 ]
 
-# Define GPIO pins for keypad rows and columns
-ROW_PINS = [5, 6, 13, 19]  # Connected to Raspberry Pi GPIO
-COL_PINS = [12, 16, 20, 21]  # Connected to Raspberry Pi GPIO
+row_pins = [5, 6, 13, 19]
+column_pins = [12, 16, 20, 21]
 
-# Initialize keypad using the pad4pi library
-factory = Keypad.factory()
-keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS)
+# ---------------- GPIO Setup ----------------
+gpio.setmode(gpio.BCM)
 
-# Variable to store the input expression
+# Set row pins as OUTPUT (default HIGH)
+for row_pin in row_pins:
+    gpio.setup(row_pin, gpio.OUT)
+    gpio.output(row_pin, gpio.HIGH)
+
+# Set column pins as INPUT with pull-down
+for column_pin in column_pins:
+    gpio.setup(column_pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+
+# ---------------- Calculator Variable ----------------
 expression = ""
 
-# Display initial message on LCD
-lcd.clear()
-lcd.write_string("Enter Numbers:")
+# ---------------- Display Initial ----------------
+lcd_display.clear()
+lcd_display.write_string("Enter Numbers:")
 
-# Function to handle key press events
-def key_pressed(key):
-    global expression
+# ---------------- Read Keypad ----------------
+def read_keypad():
+    for row_index, row_pin in enumerate(row_pins):
+        gpio.output(row_pin, gpio.LOW)
 
-    if key.isdigit() or key in ["+", "-", "*", "/"]:  # Add key to expression
-        expression += key
-        lcd.write_string(key)
+        for col_index, column_pin in enumerate(column_pins):
+            if gpio.input(column_pin) == gpio.HIGH:
+                time.sleep(0.2)  # debounce
+                gpio.output(row_pin, gpio.HIGH)
+                return keypad_layout[row_index][col_index]
 
-    elif key == "=":  # Evaluate expression
-        try:
-            result = eval(expression)  # Evaluate using Python's eval()
-            lcd.clear()
-            lcd.write_string(f"= {result}")
-            time.sleep(3)
-        except Exception:
-            lcd.clear()
-            lcd.write_string("Error")
+        gpio.output(row_pin, gpio.HIGH)
 
-        expression = ""  # Reset input
-        lcd.clear()
-        lcd.write_string("Enter Numbers:")
+    return None
 
-    elif key == "C":  # Clear expression
-        expression = ""
-        lcd.clear()
-        lcd.write_string("Enter Numbers:")
-
-# Register keypad event handler
-keypad.registerKeyPressHandler(key_pressed)
-
+# ---------------- Main Loop ----------------
 try:
     while True:
-        time.sleep(0.1)  # Prevent excessive CPU usage
+        pressed_key = read_keypad()
 
+        if pressed_key:
+            # ---- Add numbers/operators ----
+            if pressed_key.isdigit() or pressed_key in ["+", "-", "*", "/"]:
+                expression += pressed_key
+                lcd_display.write_string(pressed_key)
+
+            # ---- Evaluate ----
+            elif pressed_key == "=":
+                try:
+                    result = eval(expression)
+                    lcd_display.clear()
+                    lcd_display.write_string("= " + str(result))
+                    time.sleep(3)
+                except:
+                    lcd_display.clear()
+                    lcd_display.write_string("Error")
+                    time.sleep(2)
+
+                # Reset
+                expression = ""
+                lcd_display.clear()
+                lcd_display.write_string("Enter Numbers:")
+
+            # ---- Clear ----
+            elif pressed_key == "C":
+                expression = ""
+                lcd_display.clear()
+                lcd_display.write_string("Enter Numbers:")
+
+        time.sleep(0.1)
+
+# ---------------- Cleanup ----------------
 except KeyboardInterrupt:
-    print("\nExiting...")
-    GPIO.cleanup()  # Cleanup GPIO on exit
-    lcd.clear()
-    lcd.write_string("System Stopped")
-    time.sleep(2)
+    gpio.cleanup()
+    lcd_display.clear()
+    lcd_display.write_string("Stopped")
+    print("Exiting...")
