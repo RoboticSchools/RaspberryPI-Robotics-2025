@@ -4,7 +4,7 @@ Components Used:
 2. DC Motor HAT
 3. Robot Car (4 DC Motors)
 4. Battery Holder with 18650 Batteries
-5. BlueDot App (Bluetooth Control)
+5. BlueDot App
 
 Install Required Library:
 pip install bluedot --break-system-packages

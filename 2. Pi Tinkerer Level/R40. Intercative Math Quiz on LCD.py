@@ -2,7 +2,7 @@
 Components Used:
 1. Raspberry Pi
 2. I2C LCD Display (16x2)
-3. 2 Push Buttons
+3. Two Push Buttons
 4. Breadboard
 5. Jumper Wires
 

@@ -11,7 +11,7 @@ import RPi.GPIO as gpio
 import time
 
 ldr_pin = 21  # GPIO pin for LDR
-led_pin = 20  # GPIO pin for LED
+led_pin = 16  # GPIO pin for LED
 
 gpio.setmode(gpio.BCM)        # Use BCM pin numbering
 gpio.setup(ldr_pin, gpio.IN)  # Set LDR as input

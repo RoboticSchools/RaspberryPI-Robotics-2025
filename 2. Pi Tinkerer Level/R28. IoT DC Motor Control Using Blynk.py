@@ -7,7 +7,7 @@ Components Used:
 5. Blynk App
 
 Install Required Library:
-pip install blynklib --break-system-packages
+pip install blynk-library-python --break-system-packages
 """
 
 from BlynkLib import Blynk
@@ -21,7 +21,7 @@ mh = Raspi_MotorHAT(addr=0x6f)  # Initialize Motor HAT
 motor = mh.getMotor(3)  # Select motor (port 3)
 motor.setSpeed(150)     # Set motor speed (0–255)
 
-blynk = Blynk(BLYNK_AUTH)  # Connect to Blynk server
+blynk = Blynk(BLYNK_AUTH, server="blynk.cloud", port=80)  # Connect to Blynk server
 
 def move_forward():
     motor.run(Raspi_MotorHAT.FORWARD)  # Rotate motor forward
@@ -35,21 +35,29 @@ def stop_motor():
     motor.run(Raspi_MotorHAT.RELEASE)  # Stop motor
     print("Motor Stopped")
 
-# Called when Forward button (V1) is pressed/released
-@blynk.on("V1")
+
 def forward_handler(value):
     if int(value[0]) == 1:   # Button pressed
         move_forward()
     else:                    # Button released
         stop_motor()
 
-# Called when Backward button (V2) is pressed/released
-@blynk.on("V2")
+
 def backward_handler(value):
     if int(value[0]) == 1:
         move_backward()
     else:
         stop_motor()
+
+
+def blynk_connected():
+    print("Blynk Connected")  # Connection status
+
+
+blynk.on("V1", forward_handler)
+blynk.on("V2", backward_handler)
+blynk.on("connected", blynk_connected)
+
 
 try:
     print("Waiting for Blynk control...")  # Status message

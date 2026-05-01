@@ -4,7 +4,7 @@ Components Used:
 2. DC Motor HAT
 3. DC Motor
 4. Battery Holder with 18650 Batteries
-5. 2 Push Buttons (Toggle + Stop)
+5. Two Push Buttons (Toggle + Stop)
 6. Breadboard
 7. Jumper Wires
 """

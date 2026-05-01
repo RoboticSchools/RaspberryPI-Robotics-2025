@@ -24,14 +24,19 @@ lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
 try:
     while True:
         user_text = input("Enter text (max 15 chars): ")  # Get user input
+        row = int(input("Enter row (0 or 1): "))  # Get row input
 
         if len(user_text) > 15:  # Validate length
             print("Error: Max 15 characters allowed")
             continue
 
+        if row not in [0, 1]:  # Validate row
+            print("Error: Row must be 0 or 1")
+            continue
+
         lcd.clear()  # Clear display
 
-        lcd.cursor_pos = (0, 0)  # First row
+        lcd.cursor_pos = (row, 0)  # Set selected row
         lcd.write_string(user_text)  # Display text
 
         time.sleep(0.5)  # Small delay for smooth update

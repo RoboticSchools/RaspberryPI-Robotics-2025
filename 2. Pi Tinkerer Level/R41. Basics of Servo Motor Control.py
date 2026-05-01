@@ -3,7 +3,6 @@ Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
 3. Servo Motor
-4. Jumper Wires
 """
 
 from Raspi_PWM_Servo_Driver import PWM

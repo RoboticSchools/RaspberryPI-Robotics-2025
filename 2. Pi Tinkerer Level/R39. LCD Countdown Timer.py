@@ -2,40 +2,58 @@
 Components Used:
 1. Raspberry Pi
 2. I2C LCD Display (16x2)
-3. Breadboard
-4. Jumper Wires
+3. Push Button
+4. Breadboard
+5. Jumper Wires
 
 Install Required Library:
 pip install RPLCD smbus2 --break-system-packages
-
-Note:
-Check I2C address using:
-i2cdetect -y 1
-
-Common addresses:
-0x27 or 0x3F
 """
-
 from RPLCD.i2c import CharLCD
+import RPi.GPIO as GPIO
 import time
 
-# Initialize LCD
-lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16,rows=2)
+# GPIO setup for push button
+button_pin = 21  # GPIO pin connected to button
+GPIO.setmode(GPIO.BCM)  # Use BCM pin numbering
+GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Enable internal pull-up resistor
 
-lcd.clear()  # Clear display
-
-lcd.cursor_pos = (0, 0)  # First row
-lcd.write_string("Countdown Timer")
+# Initialize LCD (change address if needed)
+lcd = CharLCD(i2c_expander='PCF8574', address=0x27, cols=16, rows=2)
 
 try:
-    for i in range(10, -1, -1):  # Countdown from 10 to 0
-        lcd.cursor_pos = (1, 0)  # Second row
-        lcd.write_string(f"Time: {i:<5}")  # Display time (clean formatting)
-        time.sleep(1)
+    while True:
+        # Ask user for countdown time
+        count = int(input("Enter time: "))
 
-    lcd.clear()
-    lcd.cursor_pos = (0, 0)
-    lcd.write_string("Time Up!")  # Final message
+        # Show ready message on LCD
+        lcd.clear()
+        lcd.write_string("Press to Start")
+
+        # Wait until button is pressed
+        while GPIO.input(button_pin):
+            pass
+
+        time.sleep(0.3)  # Small debounce delay
+
+        # Countdown loop
+        for i in range(count, -1, -1):
+            lcd.cursor_pos = (1, 0)  # Second row
+            lcd.write_string(f"Time:{i:<5}")  # Display remaining time
+
+            time.sleep(1)  # 1-second delay
+
+            # Check if button pressed again ? Stop
+            if not GPIO.input(button_pin):
+                lcd.clear()
+                lcd.write_string("Stopped")  # Stop message
+                break
+
+        else:
+            # If countdown completes normally
+            lcd.clear()
+            lcd.write_string("Time Up")  # Final message
 
 except KeyboardInterrupt:
-    lcd.clear()     # Clear LCD on exit
+    lcd.clear()      # Clear LCD on exit
+    GPIO.cleanup()  # Reset GPIO pins

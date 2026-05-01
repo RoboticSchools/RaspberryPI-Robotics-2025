@@ -2,7 +2,7 @@
 Components Used:
 1. Raspberry Pi
 2. DC Motor HAT
-3. 2 LDR Sensors (Left & Right)
+3. Two LDR Sensors (Left & Right)
 4. Robot Car (4 DC Motors)
 5. Battery Holder with 18650 Batteries
 6. Jumper Wires

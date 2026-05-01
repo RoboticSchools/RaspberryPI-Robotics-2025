@@ -1,7 +1,7 @@
 """
 Components Used:
 1. Raspberry Pi
-2. 2 LDR Sensors (Left & Right)
+2. Two LDR Sensors (Left & Right)
 3. DC Motor Hat
 4. Servo Motor
 5. Breadboard
